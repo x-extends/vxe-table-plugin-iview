@@ -1,0 +1,11 @@
+.vxe-table-iview {
+  .vxe-cell {
+    > .ivu-input-wrapper,
+    > .ivu-input-number, 
+    > .ivu-select,
+    > .ivu-cascader,
+    > .ivu-date-picker-editor {
+      width: 100%;
+    }
+  }
+}
