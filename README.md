@@ -21,6 +21,58 @@
 | optionGroups | 只对 name=Select 有效，下拉组件分组选项列表 | Array | — | [] |
 | optionGroupProps | 只对 name=Select 有效，下拉组件分组选项属性参数配置 | Object | — | { options: 'options', label: 'label' } |
 
+## Demo
+
+```html
+<vxe-table
+  border
+  class="vxe-table-iview"
+  height="600"
+  :data.sync="tableData"
+  :edit-config="{trigger: 'click', mode: 'cell'}">
+  <vxe-table-column type="selection" width="60" fixed="left"></vxe-table-column>
+  <vxe-table-column type="index" width="60" fixed="left"></vxe-table-column>
+  <vxe-table-column prop="name" label="Input" min-width="140" :edit-render="{name: 'Input'}"></vxe-table-column>
+  <vxe-table-column prop="age" label="InputNumber" width="140" :edit-render="{name: 'InputNumber', props: {max: 35, min: 18}}"></vxe-table-column>
+  <vxe-table-column prop="sex" label="Select" width="140" :edit-render="{name: 'Select', options: sexList}"></vxe-table-column>
+  <vxe-table-column prop="region" label="Cascader" width="200" :edit-render="{name: 'Cascader', props: {data: regionList}}"> </vxe-table-column>
+  <vxe-table-column prop="date" label="DatePicker" width="200" :edit-render="{name: 'DatePicker', props: {type: 'date', format: 'yyyy/MM/dd'}}"></vxe-table-column>
+  <vxe-table-column prop="date2" label="TimePicker" width="200" :edit-render="{name: 'TimePicker', props: {type: 'time'}}"></vxe-table-column>
+  <vxe-table-column prop="rate" label="Rate" width="200" :edit-render="{name: 'Rate', type: 'visible'}"></vxe-table-column>
+  <vxe-table-column prop="flag" label="iSwitch" width="100" fixed="right" :edit-render="{name: 'iSwitch', type: 'visible'}"></vxe-table-column>
+</vxe-table>
+```
+
+```javascript
+export default {
+  data () {
+    return {
+      tableData: [],
+      sexList: [
+        {
+          'label': '男',
+          'value': '1'
+        },
+        {
+          'label': '女',
+          'value': '0'
+        }
+      ],
+      regionList: [
+        {
+          'label': '深圳',
+          'value': 'shenzhen'
+        },
+        {
+          'label': '广州',
+          'value': 'guangzhou'
+        }
+      ]
+    }
+  }
+}
+```
+
 ## License
 
 Copyright (c) 2019-present, Xu Liangzhan
