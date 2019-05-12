@@ -8,6 +8,21 @@
 
 该插件用于 vxe-table 列中渲染 iview 组件中提供简化的配置
 
+## Installing
+
+```shell
+npm install xe-utils vxe-table vxe-table-plugin-iview
+```
+
+```javascript
+import Vue from 'vue'
+import VXETable from 'vxe-table'
+import VXETablePluginIView from 'vxe-table-plugin-iview'
+import 'vxe-table-plugin-iview/dist/style.css'
+
+Vue.use(VXETable, VXETablePluginIView)
+```
+
 ## API
 
 ### edit-render 配置项说明
