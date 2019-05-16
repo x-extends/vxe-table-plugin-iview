@@ -20,7 +20,8 @@ import VXETable from 'vxe-table'
 import VXETablePluginIView from 'vxe-table-plugin-iview'
 import 'vxe-table-plugin-iview/dist/style.css'
 
-Vue.use(VXETable, VXETablePluginIView)
+Vue.use(VXETable)
+VXETable.use(VXETablePluginIView)
 ```
 
 ## API
