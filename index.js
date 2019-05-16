@@ -236,7 +236,9 @@ function clearActivedEvent (params, evnt) {
   }
 }
 
-function VXETablePluginIView (GlobalConfig, EventInterceptor) {
+function VXETablePluginIView () {}
+
+VXETablePluginIView.install = function (GlobalConfig, EventInterceptor) {
   GlobalConfig.renderMap = Object.assign(GlobalConfig.renderMap, renderMap)
   if (EventInterceptor.clearActiveds.indexOf(clearActivedEvent) === -1) {
     EventInterceptor.clearActiveds.push(clearActivedEvent)
