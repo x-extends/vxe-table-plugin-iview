@@ -268,8 +268,10 @@ var renderMap = {
           column = params.column;
       var _props$format = props.format,
           format = _props$format === void 0 ? 'hh:mm:ss' : _props$format;
-      var value = this.getRowIdentity(row, column);
-      return _xeUtils["default"].toDateString(value, format);
+
+      var cellValue = _xeUtils["default"].get(row, column.property);
+
+      return _xeUtils["default"].toDateString(cellValue, format);
     }
   },
   Rate: {

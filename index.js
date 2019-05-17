@@ -200,8 +200,8 @@ const renderMap = {
     renderCell (h, { props = {} }, params) {
       let { row, column } = params
       let { format = 'hh:mm:ss' } = props
-      let value = this.getRowIdentity(row, column)
-      return XEUtils.toDateString(value, format)
+      let cellValue = XEUtils.get(row, column.property)
+      return XEUtils.toDateString(cellValue, format)
     }
   },
   Rate: {
