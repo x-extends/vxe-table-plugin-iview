@@ -222,7 +222,7 @@ var renderMap = {
           props = _ref2$props === void 0 ? {} : _ref2$props;
       var row = params.row,
           column = params.column;
-      var rangeSeparator = props.rangeSeparator;
+      var separator = props.separator;
 
       var cellValue = _xeUtils["default"].get(row, column.property);
 
@@ -244,11 +244,11 @@ var renderMap = {
           break;
 
         case 'daterange':
-          cellValue = getFormatDates(cellValue, props, " ".concat(rangeSeparator || '-', " "), 'yyyy-MM-dd');
+          cellValue = getFormatDates(cellValue, props, " ".concat(separator || '-', " "), 'yyyy-MM-dd');
           break;
 
         case 'datetimerange':
-          cellValue = getFormatDates(cellValue, props, " ".concat(rangeSeparator || '-', " "), 'yyyy-MM-dd HH:ss:mm');
+          cellValue = getFormatDates(cellValue, props, " ".concat(separator || '-', " "), 'yyyy-MM-dd HH:ss:mm');
           break;
 
         default:
@@ -260,7 +260,17 @@ var renderMap = {
     }
   },
   TimePicker: {
-    renderEdit: defaultRender
+    renderEdit: defaultRender,
+    renderCell: function renderCell(h, _ref3, params) {
+      var _ref3$props = _ref3.props,
+          props = _ref3$props === void 0 ? {} : _ref3$props;
+      var row = params.row,
+          column = params.column;
+      var _props$format = props.format,
+          format = _props$format === void 0 ? 'hh:mm:ss' : _props$format;
+      var value = this.getRowIdentity(row, column);
+      return _xeUtils["default"].toDateString(value, format);
+    }
   },
   Rate: {
     renderEdit: defaultRender

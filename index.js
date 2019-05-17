@@ -167,7 +167,7 @@ const renderMap = {
     renderEdit: defaultRender,
     renderCell (h, { props = {} }, params) {
       let { row, column } = params
-      let { rangeSeparator } = props
+      let { separator } = props
       let cellValue = XEUtils.get(row, column.property)
       switch (props.type) {
         case 'week':
@@ -183,10 +183,10 @@ const renderMap = {
           cellValue = getFormatDates(cellValue, props, ', ', 'yyyy-MM-dd')
           break
         case 'daterange':
-          cellValue = getFormatDates(cellValue, props, ` ${rangeSeparator || '-'} `, 'yyyy-MM-dd')
+          cellValue = getFormatDates(cellValue, props, ` ${separator || '-'} `, 'yyyy-MM-dd')
           break
         case 'datetimerange':
-          cellValue = getFormatDates(cellValue, props, ` ${rangeSeparator || '-'} `, 'yyyy-MM-dd HH:ss:mm')
+          cellValue = getFormatDates(cellValue, props, ` ${separator || '-'} `, 'yyyy-MM-dd HH:ss:mm')
           break
         default:
           cellValue = getFormatDate(cellValue, props, 'yyyy-MM-dd')
@@ -196,7 +196,13 @@ const renderMap = {
     }
   },
   TimePicker: {
-    renderEdit: defaultRender
+    renderEdit: defaultRender,
+    renderCell (h, { props = {} }, params) {
+      let { row, column } = params
+      let { format = 'hh:mm:ss' } = props
+      let value = this.getRowIdentity(row, column)
+      return XEUtils.toDateString(value, format)
+    }
   },
   Rate: {
     renderEdit: defaultRender
