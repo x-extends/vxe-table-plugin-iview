@@ -272,19 +272,7 @@
       }
     },
     TimePicker: {
-      renderEdit: defaultRender,
-      renderCell: function renderCell(h, _ref3, params) {
-        var _ref3$props = _ref3.props,
-            props = _ref3$props === void 0 ? {} : _ref3$props;
-        var row = params.row,
-            column = params.column;
-        var _props$format = props.format,
-            format = _props$format === void 0 ? 'hh:mm:ss' : _props$format;
-
-        var cellValue = _xeUtils["default"].get(row, column.property);
-
-        return _xeUtils["default"].toDateString(cellValue, format);
-      }
+      renderEdit: defaultRender
     },
     Rate: {
       renderEdit: defaultRender

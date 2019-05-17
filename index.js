@@ -196,13 +196,7 @@ const renderMap = {
     }
   },
   TimePicker: {
-    renderEdit: defaultRender,
-    renderCell (h, { props = {} }, params) {
-      let { row, column } = params
-      let { format = 'hh:mm:ss' } = props
-      let cellValue = XEUtils.get(row, column.property)
-      return XEUtils.toDateString(cellValue, format)
-    }
+    renderEdit: defaultRender
   },
   Rate: {
     renderEdit: defaultRender
