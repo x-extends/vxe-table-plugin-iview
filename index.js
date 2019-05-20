@@ -245,4 +245,8 @@ VXETablePluginIView.install = function (GlobalConfig, EventInterceptor) {
   }
 }
 
+if (typeof window !== 'undefined' && window.VXETable) {
+  window.VXETable.use(VXETablePluginIView)
+}
+
 export default VXETablePluginIView

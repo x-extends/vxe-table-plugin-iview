@@ -330,6 +330,10 @@
     }
   };
 
+  if (typeof window !== 'undefined' && window.VXETable) {
+    window.VXETable.use(VXETablePluginIView);
+  }
+
   var _default = VXETablePluginIView;
   _exports["default"] = _default;
 });
