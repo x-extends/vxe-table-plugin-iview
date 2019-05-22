@@ -21,6 +21,8 @@
 
   function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
+  function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
   function getFormatDate(value, props, defaultFormat) {
     return _xeUtils["default"].toDateString(value, props.format || defaultFormat);
   }
@@ -46,7 +48,12 @@
 
   function getEvents(editRender, params) {
     var events = editRender.events;
-    var on = {};
+    var $table = params.$table;
+    var type = 'on-change';
+
+    var on = _defineProperty({}, type, function () {
+      return $table.updateStatus(params);
+    });
 
     if (events) {
       Object.assign(on, _xeUtils["default"].objectMap(events, function (cb) {
