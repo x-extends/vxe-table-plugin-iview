@@ -308,7 +308,7 @@ function getEventTargetNode(evnt, container, queryCls) {
  */
 
 
-function clearActivedEvent(params, evnt) {
+function handleClearActivedEvent(params, evnt) {
   if ( // 下拉框、日期
   getEventTargetNode(evnt, document.body, 'ivu-select-dropdown').flag) {
     return false;
@@ -317,12 +317,14 @@ function clearActivedEvent(params, evnt) {
 
 function VXETablePluginIView() {}
 
-VXETablePluginIView.install = function (GlobalConfig, EventInterceptor, options) {
-  Object.assign(GlobalConfig.renderMap, renderMap);
+VXETablePluginIView.install = function (options, _ref3) {
+  var setup = _ref3.setup,
+      interceptor = _ref3.interceptor,
+      renderer = _ref3.renderer;
+  // 添加到渲染器
+  renderer.mixin(renderMap); // 处理事件冲突
 
-  if (EventInterceptor.clearActiveds.indexOf(clearActivedEvent) === -1) {
-    EventInterceptor.clearActiveds.push(clearActivedEvent);
-  }
+  interceptor.add('event.clear_actived', handleClearActivedEvent);
 };
 
 if (typeof window !== 'undefined' && window.VXETable) {
