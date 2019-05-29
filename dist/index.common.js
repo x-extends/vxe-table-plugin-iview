@@ -280,10 +280,6 @@ var renderMap = {
 function hasClass(elem, cls) {
   return elem && elem.className && elem.className.split && elem.className.split(' ').indexOf(cls) > -1;
 }
-/**
- * 检查触发源是否属于目标节点
- */
-
 
 function getEventTargetNode(evnt, container, queryCls) {
   var targetElem;
@@ -307,6 +303,10 @@ function getEventTargetNode(evnt, container, queryCls) {
     flag: false
   };
 }
+/**
+ * 事件兼容性处理
+ */
+
 
 function clearActivedEvent(params, evnt) {
   if ( // 下拉框、日期
