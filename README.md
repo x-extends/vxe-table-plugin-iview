@@ -6,7 +6,7 @@
 [![gzip size: CSS](http://img.badgesize.io/https://unpkg.com/vxe-table-plugin-iview/dist/style.min.css?compression=gzip&label=gzip%20size:%20CSS)](http://img.badgesize.io/https://unpkg.com/vxe-table-plugin-iview/dist/style.min.css?compression=gzip&label=gzip%20size:%20CSS)
 [![npm license](https://img.shields.io/github/license/mashape/apistatus.svg)](https://github.com/xuliangzhan/vxe-table-plugin-iview/blob/master/LICENSE)
 
-该插件用于 vxe-table 表格渲染 iview 组件提供适配兼容
+该插件用于在 vxe-table 表格中适配 iview 组件的渲染
 
 ## Installing
 
