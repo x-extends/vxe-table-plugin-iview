@@ -64,6 +64,10 @@ const renderMap = {
     autofocus: 'input.ivu-input',
     renderEdit: defaultRender
   },
+  AutoComplete: {
+    autofocus: 'input.ivu-input',
+    renderEdit: defaultRender
+  },
   InputNumber: {
     autofocus: 'input.ivu-input-number-input',
     renderEdit: defaultRender
