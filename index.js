@@ -244,7 +244,7 @@ function handleClearActivedEvent (params, evnt) {
 
 function VXETablePluginIView () {}
 
-VXETablePluginIView.install = function ({ setup, interceptor, renderer }, options) {
+VXETablePluginIView.install = function ({ interceptor, renderer }) {
   // 添加到渲染器
   renderer.mixin(renderMap)
   // 处理事件冲突
