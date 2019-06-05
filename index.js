@@ -94,13 +94,13 @@ const renderMap = {
               }
             },
             on: getEvents(editRender, params)
-          }, XEUtils.map(optionGroups, function (group, gIndex) {
+          }, XEUtils.map(optionGroups, (group, gIndex) => {
             return h('OptionGroup', {
               props: {
                 label: group[groupLabel]
               },
               key: gIndex
-            }, XEUtils.map(group[groupOptions], function (item, index) {
+            }, XEUtils.map(group[groupOptions], (item, index) => {
               return h('Option', {
                 props: {
                   value: item[valueProp],
@@ -122,7 +122,7 @@ const renderMap = {
             }
           },
           on: getEvents(editRender, params)
-        }, XEUtils.map(options, function (item, index) {
+        }, XEUtils.map(options, (item, index) => {
           return h('Option', {
             props: {
               value: item[valueProp],
