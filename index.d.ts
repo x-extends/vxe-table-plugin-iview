@@ -1,10 +1,10 @@
-export interface VXETablePluginElementOptions {
+export interface VXETablePluginIViewOptions {
 
 }
 
 /**
- * vxe-table renderer plugins for element-ui.
+ * vxe-table renderer plugins for iview.
  */
-declare var VXETablePluginElement: VXETablePluginElementOptions;
+declare var VXETablePluginIView: VXETablePluginIViewOptions;
 
-export default VXETablePluginElement;
+export default VXETablePluginIView;

@@ -28,7 +28,7 @@ function getEvents (editRender, params) {
     [type]: () => $table.updateStatus(params)
   }
   if (events) {
-    Object.assign(on, XEUtils.objectMap(events, cb => function () {
+    XEUtils.assign(on, XEUtils.objectMap(events, cb => function () {
       cb.apply(null, [params].concat.apply(params, arguments))
     }))
   }
@@ -39,7 +39,7 @@ function defaultRender (h, editRender, params) {
   let { $table, row, column } = params
   let { props } = editRender
   if ($table.size) {
-    props = Object.assign({ size: $table.size }, props)
+    props = XEUtils.assign({ size: $table.size }, props)
   }
   return [
     h(editRender.name, {

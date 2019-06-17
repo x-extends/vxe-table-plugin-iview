@@ -56,7 +56,7 @@
     });
 
     if (events) {
-      Object.assign(on, _xeUtils["default"].objectMap(events, function (cb) {
+      _xeUtils["default"].assign(on, _xeUtils["default"].objectMap(events, function (cb) {
         return function () {
           cb.apply(null, [params].concat.apply(params, arguments));
         };
@@ -73,7 +73,7 @@
     var props = editRender.props;
 
     if ($table.size) {
-      props = Object.assign({
+      props = _xeUtils["default"].assign({
         size: $table.size
       }, props);
     }
