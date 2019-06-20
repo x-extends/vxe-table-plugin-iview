@@ -46,7 +46,7 @@
     }
   }
 
-  function getEvents(editRender, params) {
+  function getCellEvents(editRender, params) {
     var events = editRender.events;
     var $table = params.$table;
     var type = 'on-change';
@@ -66,15 +66,15 @@
     return on;
   }
 
-  function defaultRender(h, editRender, params) {
+  function defaultCellRender(h, editRender, params) {
     var $table = params.$table,
         row = params.row,
         column = params.column;
     var props = editRender.props;
 
-    if ($table.size) {
+    if ($table.vSize) {
       props = _xeUtils["default"].assign({
-        size: $table.size
+        size: $table.vSize
       }, props);
     }
 
@@ -86,26 +86,92 @@
           _xeUtils["default"].set(row, column.property, value);
         }
       },
-      on: getEvents(editRender, params)
+      on: getCellEvents(editRender, params)
     })];
+  }
+
+  function getFilterEvents(on, filterRender, params) {
+    var events = filterRender.events;
+
+    if (events) {
+      _xeUtils["default"].assign(on, _xeUtils["default"].objectMap(events, function (cb) {
+        return function () {
+          cb.apply(null, [params].concat.apply(params, arguments));
+        };
+      }));
+    }
+
+    return on;
+  }
+
+  function defaultFilterRender(h, filterRender, params, context) {
+    var $table = params.$table,
+        column = params.column;
+    var name = filterRender.name,
+        props = filterRender.props;
+    var type = 'on-change';
+
+    if ($table.vSize) {
+      props = _xeUtils["default"].assign({
+        size: $table.vSize
+      }, props);
+    }
+
+    return column.filters.map(function (item) {
+      return h(name, {
+        props: props,
+        model: {
+          value: item.data,
+          callback: function callback(optionValue) {
+            item.data = optionValue;
+          }
+        },
+        on: getFilterEvents(_defineProperty({}, type, function () {
+          context.changeMultipleOption({}, !!item.data, item);
+        }), filterRender, params)
+      });
+    });
+  }
+
+  function defaultFilterMethod(_ref) {
+    var option = _ref.option,
+        row = _ref.row,
+        column = _ref.column;
+    var data = option.data;
+
+    var cellValue = _xeUtils["default"].get(row, column.property);
+
+    return cellValue === data;
   }
 
   function cellText(h, cellValue) {
     return ['' + (cellValue === null || cellValue === void 0 ? '' : cellValue)];
   }
+  /**
+   * 渲染函数
+   * renderEdit(h, editRender, params, context)
+   * renderCell(h, editRender, params, context)
+   */
+
 
   var renderMap = {
     Input: {
       autofocus: 'input.ivu-input',
-      renderEdit: defaultRender
+      renderEdit: defaultCellRender,
+      renderFilter: defaultFilterRender,
+      filterMethod: defaultFilterMethod
     },
     AutoComplete: {
       autofocus: 'input.ivu-input',
-      renderEdit: defaultRender
+      renderEdit: defaultCellRender,
+      renderFilter: defaultFilterRender,
+      filterMethod: defaultFilterMethod
     },
     InputNumber: {
       autofocus: 'input.ivu-input-number-input',
-      renderEdit: defaultRender
+      renderEdit: defaultCellRender,
+      renderFilter: defaultFilterRender,
+      filterMethod: defaultFilterMethod
     },
     Select: {
       renderEdit: function renderEdit(h, editRender, params) {
@@ -123,9 +189,9 @@
         var labelProp = optionProps.label || 'label';
         var valueProp = optionProps.value || 'value';
 
-        if ($table.size) {
+        if ($table.vSize) {
           props = _xeUtils["default"].assign({
-            size: $table.size
+            size: $table.vSize
           }, props);
         }
 
@@ -140,7 +206,7 @@
                 _xeUtils["default"].set(row, column.property, cellValue);
               }
             },
-            on: getEvents(editRender, params)
+            on: getCellEvents(editRender, params)
           }, _xeUtils["default"].map(optionGroups, function (group, gIndex) {
             return h('OptionGroup', {
               props: {
@@ -167,7 +233,7 @@
               _xeUtils["default"].set(row, column.property, cellValue);
             }
           },
-          on: getEvents(editRender, params)
+          on: getCellEvents(editRender, params)
         }, _xeUtils["default"].map(options, function (item, index) {
           return h('Option', {
             props: {
@@ -223,10 +289,10 @@
       }
     },
     Cascader: {
-      renderEdit: defaultRender,
-      renderCell: function renderCell(h, _ref, params) {
-        var _ref$props = _ref.props,
-            props = _ref$props === void 0 ? {} : _ref$props;
+      renderEdit: defaultCellRender,
+      renderCell: function renderCell(h, _ref2, params) {
+        var _ref2$props = _ref2.props,
+            props = _ref2$props === void 0 ? {} : _ref2$props;
         var row = params.row,
             column = params.column;
 
@@ -239,10 +305,10 @@
       }
     },
     DatePicker: {
-      renderEdit: defaultRender,
-      renderCell: function renderCell(h, _ref2, params) {
-        var _ref2$props = _ref2.props,
-            props = _ref2$props === void 0 ? {} : _ref2$props;
+      renderEdit: defaultCellRender,
+      renderCell: function renderCell(h, _ref3, params) {
+        var _ref3$props = _ref3.props,
+            props = _ref3$props === void 0 ? {} : _ref3$props;
         var row = params.row,
             column = params.column;
         var separator = props.separator;
@@ -283,48 +349,36 @@
       }
     },
     TimePicker: {
-      renderEdit: defaultRender
+      renderEdit: defaultCellRender
     },
     Rate: {
-      renderEdit: defaultRender
+      renderEdit: defaultCellRender
     },
     iSwitch: {
-      renderEdit: defaultRender
+      renderEdit: defaultCellRender
     }
+    /**
+     * 筛选兼容性处理
+     */
+
   };
 
-  function hasClass(elem, cls) {
-    return elem && elem.className && elem.className.split && elem.className.split(' ').indexOf(cls) > -1;
-  }
+  function handleClearFilterEvent(params, evnt, _ref4) {
+    var getEventTargetNode = _ref4.getEventTargetNode;
 
-  function getEventTargetNode(evnt, container, queryCls) {
-    var targetElem;
-    var target = evnt.target;
-
-    while (target && target.nodeType && target !== document) {
-      if (queryCls && hasClass(target, queryCls)) {
-        targetElem = target;
-      } else if (target === container) {
-        return {
-          flag: queryCls ? !!targetElem : true,
-          container: container,
-          targetElem: targetElem
-        };
-      }
-
-      target = target.parentNode;
+    if ( // 下拉框、日期
+    getEventTargetNode(evnt, document.body, 'ivu-select-dropdown').flag) {
+      return false;
     }
-
-    return {
-      flag: false
-    };
   }
   /**
-   * 事件兼容性处理
+   * 单元格兼容性处理
    */
 
 
-  function handleClearActivedEvent(params, evnt) {
+  function handleClearActivedEvent(params, evnt, _ref5) {
+    var getEventTargetNode = _ref5.getEventTargetNode;
+
     if ( // 下拉框、日期
     getEventTargetNode(evnt, document.body, 'ivu-select-dropdown').flag) {
       return false;
@@ -333,12 +387,13 @@
 
   function VXETablePluginIView() {}
 
-  VXETablePluginIView.install = function (_ref3) {
-    var interceptor = _ref3.interceptor,
-        renderer = _ref3.renderer;
+  VXETablePluginIView.install = function (_ref6) {
+    var interceptor = _ref6.interceptor,
+        renderer = _ref6.renderer;
     // 添加到渲染器
     renderer.mixin(renderMap); // 处理事件冲突
 
+    interceptor.add('event.clear_filter', handleClearFilterEvent);
     interceptor.add('event.clear_actived', handleClearActivedEvent);
   };
 

@@ -20,7 +20,7 @@ function matchCascaderData (index, list, values, labels) {
   }
 }
 
-function getEvents (editRender, params) {
+function getCellEvents (editRender, params) {
   let { events } = editRender
   let { $table } = params
   let type = 'on-change'
@@ -35,11 +35,11 @@ function getEvents (editRender, params) {
   return on
 }
 
-function defaultRender (h, editRender, params) {
+function defaultCellRender (h, editRender, params) {
   let { $table, row, column } = params
   let { props } = editRender
-  if ($table.size) {
-    props = XEUtils.assign({ size: $table.size }, props)
+  if ($table.vSize) {
+    props = XEUtils.assign({ size: $table.vSize }, props)
   }
   return [
     h(editRender.name, {
@@ -50,27 +50,79 @@ function defaultRender (h, editRender, params) {
           XEUtils.set(row, column.property, value)
         }
       },
-      on: getEvents(editRender, params)
+      on: getCellEvents(editRender, params)
     })
   ]
+}
+
+function getFilterEvents (on, filterRender, params) {
+  let { events } = filterRender
+  if (events) {
+    XEUtils.assign(on, XEUtils.objectMap(events, cb => function () {
+      cb.apply(null, [params].concat.apply(params, arguments))
+    }))
+  }
+  return on
+}
+
+function defaultFilterRender (h, filterRender, params, context) {
+  let { $table, column } = params
+  let { name, props } = filterRender
+  let type = 'on-change'
+  if ($table.vSize) {
+    props = XEUtils.assign({ size: $table.vSize }, props)
+  }
+  return column.filters.map(item => {
+    return h(name, {
+      props,
+      model: {
+        value: item.data,
+        callback (optionValue) {
+          item.data = optionValue
+        }
+      },
+      on: getFilterEvents({
+        [type] () {
+          context.changeMultipleOption({}, !!item.data, item)
+        }
+      }, filterRender, params)
+    })
+  })
+}
+
+function defaultFilterMethod ({ option, row, column }) {
+  let { data } = option
+  let cellValue = XEUtils.get(row, column.property)
+  return cellValue === data
 }
 
 function cellText (h, cellValue) {
   return ['' + (cellValue === null || cellValue === void 0 ? '' : cellValue)]
 }
 
+/**
+ * 渲染函数
+ * renderEdit(h, editRender, params, context)
+ * renderCell(h, editRender, params, context)
+ */
 const renderMap = {
   Input: {
     autofocus: 'input.ivu-input',
-    renderEdit: defaultRender
+    renderEdit: defaultCellRender,
+    renderFilter: defaultFilterRender,
+    filterMethod: defaultFilterMethod
   },
   AutoComplete: {
     autofocus: 'input.ivu-input',
-    renderEdit: defaultRender
+    renderEdit: defaultCellRender,
+    renderFilter: defaultFilterRender,
+    filterMethod: defaultFilterMethod
   },
   InputNumber: {
     autofocus: 'input.ivu-input-number-input',
-    renderEdit: defaultRender
+    renderEdit: defaultCellRender,
+    renderFilter: defaultFilterRender,
+    filterMethod: defaultFilterMethod
   },
   Select: {
     renderEdit (h, editRender, params) {
@@ -78,8 +130,8 @@ const renderMap = {
       let { $table, row, column } = params
       let labelProp = optionProps.label || 'label'
       let valueProp = optionProps.value || 'value'
-      if ($table.size) {
-        props = XEUtils.assign({ size: $table.size }, props)
+      if ($table.vSize) {
+        props = XEUtils.assign({ size: $table.vSize }, props)
       }
       if (optionGroups) {
         let groupOptions = optionGroupProps.options || 'options'
@@ -93,7 +145,7 @@ const renderMap = {
                 XEUtils.set(row, column.property, cellValue)
               }
             },
-            on: getEvents(editRender, params)
+            on: getCellEvents(editRender, params)
           }, XEUtils.map(optionGroups, (group, gIndex) => {
             return h('OptionGroup', {
               props: {
@@ -121,7 +173,7 @@ const renderMap = {
               XEUtils.set(row, column.property, cellValue)
             }
           },
-          on: getEvents(editRender, params)
+          on: getCellEvents(editRender, params)
         }, XEUtils.map(options, (item, index) => {
           return h('Option', {
             props: {
@@ -159,7 +211,7 @@ const renderMap = {
     }
   },
   Cascader: {
-    renderEdit: defaultRender,
+    renderEdit: defaultCellRender,
     renderCell (h, { props = {} }, params) {
       let { row, column } = params
       let cellValue = XEUtils.get(row, column.property)
@@ -170,7 +222,7 @@ const renderMap = {
     }
   },
   DatePicker: {
-    renderEdit: defaultRender,
+    renderEdit: defaultCellRender,
     renderCell (h, { props = {} }, params) {
       let { row, column } = params
       let { separator } = props
@@ -202,38 +254,32 @@ const renderMap = {
     }
   },
   TimePicker: {
-    renderEdit: defaultRender
+    renderEdit: defaultCellRender
   },
   Rate: {
-    renderEdit: defaultRender
+    renderEdit: defaultCellRender
   },
   iSwitch: {
-    renderEdit: defaultRender
+    renderEdit: defaultCellRender
   }
-}
-
-function hasClass (elem, cls) {
-  return elem && elem.className && elem.className.split && elem.className.split(' ').indexOf(cls) > -1
-}
-
-function getEventTargetNode (evnt, container, queryCls) {
-  let targetElem
-  let target = evnt.target
-  while (target && target.nodeType && target !== document) {
-    if (queryCls && hasClass(target, queryCls)) {
-      targetElem = target
-    } else if (target === container) {
-      return { flag: queryCls ? !!targetElem : true, container, targetElem: targetElem }
-    }
-    target = target.parentNode
-  }
-  return { flag: false }
 }
 
 /**
- * 事件兼容性处理
+ * 筛选兼容性处理
  */
-function handleClearActivedEvent (params, evnt) {
+function handleClearFilterEvent (params, evnt, { getEventTargetNode }) {
+  if (
+    // 下拉框、日期
+    getEventTargetNode(evnt, document.body, 'ivu-select-dropdown').flag
+  ) {
+    return false
+  }
+}
+
+/**
+ * 单元格兼容性处理
+ */
+function handleClearActivedEvent (params, evnt, { getEventTargetNode }) {
   if (
     // 下拉框、日期
     getEventTargetNode(evnt, document.body, 'ivu-select-dropdown').flag
@@ -248,6 +294,7 @@ VXETablePluginIView.install = function ({ interceptor, renderer }) {
   // 添加到渲染器
   renderer.mixin(renderMap)
   // 处理事件冲突
+  interceptor.add('event.clear_filter', handleClearFilterEvent)
   interceptor.add('event.clear_actived', handleClearActivedEvent)
 }
 
