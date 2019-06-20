@@ -33,6 +33,11 @@
     }).join(separator);
   }
 
+  function equalDaterange(cellValue, data, props, defaultFormat) {
+    cellValue = getFormatDate(cellValue, props, defaultFormat);
+    return cellValue >= getFormatDate(data[0], props, defaultFormat) && cellValue <= getFormatDate(data[1], props, defaultFormat);
+  }
+
   function matchCascaderData(index, list, values, labels) {
     var val = values[index];
 
@@ -346,6 +351,61 @@
         }
 
         return cellText(h, cellValue);
+      },
+      renderFilter: function renderFilter(h, filterRender, params, context) {
+        var $table = params.$table,
+            column = params.column;
+        var props = filterRender.props;
+
+        if ($table.vSize) {
+          props = _xeUtils["default"].assign({
+            size: $table.vSize
+          }, props);
+        }
+
+        return column.filters.map(function (item) {
+          return h(filterRender.name, {
+            props: props,
+            model: {
+              value: item.data,
+              callback: function callback(optionValue) {
+                item.data = optionValue;
+              }
+            },
+            on: getFilterEvents({
+              'on-change': function onChange(value) {
+                // 当前的选项是否选中，如果有值就是选中了，需要进行筛选
+                context.changeMultipleOption({}, value && value.length > 0, item);
+              }
+            }, filterRender, params)
+          });
+        });
+      },
+      filterMethod: function filterMethod(_ref4) {
+        var option = _ref4.option,
+            row = _ref4.row,
+            column = _ref4.column;
+        var data = option.data;
+        var filterRender = column.filterRender;
+        var _filterRender$props = filterRender.props,
+            props = _filterRender$props === void 0 ? {} : _filterRender$props;
+
+        var cellValue = _xeUtils["default"].get(row, column.property);
+
+        if (data) {
+          switch (props.type) {
+            case 'daterange':
+              return equalDaterange(cellValue, data, props, 'yyyy-MM-dd');
+
+            case 'datetimerange':
+              return equalDaterange(cellValue, data, props, 'yyyy-MM-dd HH:ss:mm');
+
+            default:
+              return cellValue === data;
+          }
+        }
+
+        return false;
       }
     },
     TimePicker: {
@@ -363,8 +423,8 @@
 
   };
 
-  function handleClearFilterEvent(params, evnt, _ref4) {
-    var getEventTargetNode = _ref4.getEventTargetNode;
+  function handleClearFilterEvent(params, evnt, _ref5) {
+    var getEventTargetNode = _ref5.getEventTargetNode;
 
     if ( // 下拉框、日期
     getEventTargetNode(evnt, document.body, 'ivu-select-dropdown').flag) {
@@ -376,8 +436,8 @@
    */
 
 
-  function handleClearActivedEvent(params, evnt, _ref5) {
-    var getEventTargetNode = _ref5.getEventTargetNode;
+  function handleClearActivedEvent(params, evnt, _ref6) {
+    var getEventTargetNode = _ref6.getEventTargetNode;
 
     if ( // 下拉框、日期
     getEventTargetNode(evnt, document.body, 'ivu-select-dropdown').flag) {
@@ -387,9 +447,9 @@
 
   function VXETablePluginIView() {}
 
-  VXETablePluginIView.install = function (_ref6) {
-    var interceptor = _ref6.interceptor,
-        renderer = _ref6.renderer;
+  VXETablePluginIView.install = function (_ref7) {
+    var interceptor = _ref7.interceptor,
+        renderer = _ref7.renderer;
     // 添加到渲染器
     renderer.mixin(renderMap); // 处理事件冲突
 

@@ -8,6 +8,11 @@ function getFormatDates (values, props, separator, defaultFormat) {
   return XEUtils.map(values, date => getFormatDate(date, props, defaultFormat)).join(separator)
 }
 
+function equalDaterange (cellValue, data, props, defaultFormat) {
+  cellValue = getFormatDate(cellValue, props, defaultFormat)
+  return cellValue >= getFormatDate(data[0], props, defaultFormat) && cellValue <= getFormatDate(data[1], props, defaultFormat)
+}
+
 function matchCascaderData (index, list, values, labels) {
   let val = values[index]
   if (list && values.length > index) {
@@ -251,6 +256,47 @@ const renderMap = {
           break
       }
       return cellText(h, cellValue)
+    },
+    renderFilter (h, filterRender, params, context) {
+      let { $table, column } = params
+      let { props } = filterRender
+      if ($table.vSize) {
+        props = XEUtils.assign({ size: $table.vSize }, props)
+      }
+      return column.filters.map(item => {
+        return h(filterRender.name, {
+          props,
+          model: {
+            value: item.data,
+            callback (optionValue) {
+              item.data = optionValue
+            }
+          },
+          on: getFilterEvents({
+            'on-change' (value) {
+              // 当前的选项是否选中，如果有值就是选中了，需要进行筛选
+              context.changeMultipleOption({}, value && value.length > 0, item)
+            }
+          }, filterRender, params)
+        })
+      })
+    },
+    filterMethod ({ option, row, column }) {
+      let { data } = option
+      let { filterRender } = column
+      let { props = {} } = filterRender
+      let cellValue = XEUtils.get(row, column.property)
+      if (data) {
+        switch (props.type) {
+          case 'daterange':
+            return equalDaterange(cellValue, data, props, 'yyyy-MM-dd')
+          case 'datetimerange':
+            return equalDaterange(cellValue, data, props, 'yyyy-MM-dd HH:ss:mm')
+          default:
+            return cellValue === data
+        }
+      }
+      return false
     }
   },
   TimePicker: {
