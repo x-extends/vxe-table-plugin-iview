@@ -423,8 +423,8 @@
 
   };
 
-  function handleClearFilterEvent(params, evnt, _ref5) {
-    var getEventTargetNode = _ref5.getEventTargetNode;
+  function handleClearFilterEvent(params, evnt, context) {
+    var getEventTargetNode = context.getEventTargetNode;
 
     if ( // 下拉框、日期
     getEventTargetNode(evnt, document.body, 'ivu-select-dropdown').flag) {
@@ -436,8 +436,8 @@
    */
 
 
-  function handleClearActivedEvent(params, evnt, _ref6) {
-    var getEventTargetNode = _ref6.getEventTargetNode;
+  function handleClearActivedEvent(params, evnt, context) {
+    var getEventTargetNode = context.getEventTargetNode;
 
     if ( // 下拉框、日期
     getEventTargetNode(evnt, document.body, 'ivu-select-dropdown').flag) {
@@ -447,9 +447,9 @@
 
   function VXETablePluginIView() {}
 
-  VXETablePluginIView.install = function (_ref7) {
-    var interceptor = _ref7.interceptor,
-        renderer = _ref7.renderer;
+  VXETablePluginIView.install = function (_ref5) {
+    var interceptor = _ref5.interceptor,
+        renderer = _ref5.renderer;
     // 添加到渲染器
     renderer.mixin(renderMap); // 处理事件冲突
 
