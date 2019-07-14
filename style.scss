@@ -12,7 +12,8 @@
       width: 100%;
     }
   }
-  &.c--highlight {
+  &.c--highlight,
+  .vxe-table.c--highlight {
     .vxe-cell {
       > .ivu-input-wrapper,
       > .ivu-auto-complete,

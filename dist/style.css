@@ -1,8 +1,16 @@
 .vxe-table-iview.c--highlight .vxe-cell > .ivu-input-wrapper .ivu-input,
 .vxe-table-iview.c--highlight .vxe-cell > .ivu-auto-complete .ivu-input,
 .vxe-table-iview.c--highlight .vxe-cell > .ivu-cascader .ivu-input,
-.vxe-table-iview.c--highlight .vxe-cell > .ivu-date-picker .ivu-input, .vxe-table-iview.c--highlight .vxe-cell > .ivu-input-number, .vxe-table-iview.c--highlight .vxe-cell > .ivu-input-number .ivu-input-number-handler-wrap,
-.vxe-table-iview.c--highlight .vxe-cell > .ivu-input-number .ivu-input-number-handler-down, .vxe-table-iview.c--highlight .vxe-cell > .ivu-select .ivu-select-selection {
+.vxe-table-iview.c--highlight .vxe-cell > .ivu-date-picker .ivu-input,
+.vxe-table-iview .vxe-table.c--highlight .vxe-cell > .ivu-input-wrapper .ivu-input,
+.vxe-table-iview .vxe-table.c--highlight .vxe-cell > .ivu-auto-complete .ivu-input,
+.vxe-table-iview .vxe-table.c--highlight .vxe-cell > .ivu-cascader .ivu-input,
+.vxe-table-iview .vxe-table.c--highlight .vxe-cell > .ivu-date-picker .ivu-input, .vxe-table-iview.c--highlight .vxe-cell > .ivu-input-number,
+.vxe-table-iview .vxe-table.c--highlight .vxe-cell > .ivu-input-number, .vxe-table-iview.c--highlight .vxe-cell > .ivu-input-number .ivu-input-number-handler-wrap,
+.vxe-table-iview.c--highlight .vxe-cell > .ivu-input-number .ivu-input-number-handler-down,
+.vxe-table-iview .vxe-table.c--highlight .vxe-cell > .ivu-input-number .ivu-input-number-handler-wrap,
+.vxe-table-iview .vxe-table.c--highlight .vxe-cell > .ivu-input-number .ivu-input-number-handler-down, .vxe-table-iview.c--highlight .vxe-cell > .ivu-select .ivu-select-selection,
+.vxe-table-iview .vxe-table.c--highlight .vxe-cell > .ivu-select .ivu-select-selection {
   border: 0;
   box-shadow: none; }
 
@@ -16,5 +24,9 @@
 .vxe-table-iview.c--highlight .vxe-cell > .ivu-input-wrapper .ivu-input,
 .vxe-table-iview.c--highlight .vxe-cell > .ivu-auto-complete .ivu-input,
 .vxe-table-iview.c--highlight .vxe-cell > .ivu-cascader .ivu-input,
-.vxe-table-iview.c--highlight .vxe-cell > .ivu-date-picker .ivu-input {
+.vxe-table-iview.c--highlight .vxe-cell > .ivu-date-picker .ivu-input,
+.vxe-table-iview .vxe-table.c--highlight .vxe-cell > .ivu-input-wrapper .ivu-input,
+.vxe-table-iview .vxe-table.c--highlight .vxe-cell > .ivu-auto-complete .ivu-input,
+.vxe-table-iview .vxe-table.c--highlight .vxe-cell > .ivu-cascader .ivu-input,
+.vxe-table-iview .vxe-table.c--highlight .vxe-cell > .ivu-date-picker .ivu-input {
   padding: 0; }
