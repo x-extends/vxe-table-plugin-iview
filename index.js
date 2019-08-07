@@ -25,6 +25,10 @@ function matchCascaderData (index, list, values, labels) {
   }
 }
 
+function getProps ({ $table }, { props }) {
+  return XEUtils.assign($table.vSize ? { size: $table.vSize } : {}, props)
+}
+
 function getCellEvents (editRender, params) {
   let { events } = editRender
   let { $table } = params
@@ -41,11 +45,8 @@ function getCellEvents (editRender, params) {
 }
 
 function defaultCellRender (h, editRender, params) {
-  let { $table, row, column } = params
-  let { props } = editRender
-  if ($table.vSize) {
-    props = XEUtils.assign({ size: $table.vSize }, props)
-  }
+  let { row, column } = params
+  let props = getProps(params, editRender)
   return [
     h(editRender.name, {
       props,
@@ -71,12 +72,10 @@ function getFilterEvents (on, filterRender, params) {
 }
 
 function defaultFilterRender (h, filterRender, params, context) {
-  let { $table, column } = params
-  let { name, props } = filterRender
+  let { column } = params
+  let { name } = filterRender
   let type = 'on-change'
-  if ($table.vSize) {
-    props = XEUtils.assign({ size: $table.vSize }, props)
-  }
+  let props = getProps(params, filterRender)
   return column.filters.map(item => {
     return h(name, {
       props,
@@ -88,17 +87,35 @@ function defaultFilterRender (h, filterRender, params, context) {
       },
       on: getFilterEvents({
         [type] () {
-          context[column.filterMultiple ? 'changeMultipleOption' : 'changeRadioOption']({}, !!item.data, item)
+          handleConfirmFilter(context, column, !!item.data, item)
         }
       }, filterRender, params)
     })
   })
 }
 
+function handleConfirmFilter (context, column, checked, item) {
+  context[column.filterMultiple ? 'changeMultipleOption' : 'changeRadioOption']({}, checked, item)
+}
+
 function defaultFilterMethod ({ option, row, column }) {
   let { data } = option
   let cellValue = XEUtils.get(row, column.property)
   return cellValue === data
+}
+
+function renderOptions (h, options, optionProps) {
+  let labelProp = optionProps.label || 'label'
+  let valueProp = optionProps.value || 'value'
+  return XEUtils.map(options, (item, index) => {
+    return h('Option', {
+      props: {
+        value: item[valueProp],
+        label: item[labelProp]
+      },
+      key: index
+    })
+  })
 }
 
 function cellText (h, cellValue) {
@@ -129,13 +146,9 @@ const renderMap = {
   },
   Select: {
     renderEdit (h, editRender, params) {
-      let { options, optionGroups, props = {}, optionProps = {}, optionGroupProps = {} } = editRender
-      let { $table, row, column } = params
-      let labelProp = optionProps.label || 'label'
-      let valueProp = optionProps.value || 'value'
-      if ($table.vSize) {
-        props = XEUtils.assign({ size: $table.vSize }, props)
-      }
+      let { options, optionGroups, optionProps = {}, optionGroupProps = {} } = editRender
+      let { row, column } = params
+      let props = getProps(params, editRender)
       if (optionGroups) {
         let groupOptions = optionGroupProps.options || 'options'
         let groupLabel = optionGroupProps.label || 'label'
@@ -155,15 +168,7 @@ const renderMap = {
                 label: group[groupLabel]
               },
               key: gIndex
-            }, XEUtils.map(group[groupOptions], (item, index) => {
-              return h('Option', {
-                props: {
-                  value: item[valueProp],
-                  label: item[labelProp]
-                },
-                key: index
-              })
-            }))
+            }, renderOptions(h, group[groupOptions], optionProps))
           }))
         ]
       }
@@ -177,15 +182,7 @@ const renderMap = {
             }
           },
           on: getCellEvents(editRender, params)
-        }, XEUtils.map(options, (item, index) => {
-          return h('Option', {
-            props: {
-              value: item[valueProp],
-              label: item[labelProp]
-            },
-            key: index
-          })
-        }))
+        }, renderOptions(h, options, optionProps))
       ]
     },
     renderCell (h, editRender, params) {
@@ -211,6 +208,67 @@ const renderMap = {
         }).join(';'))
       }
       return cellText(h, '')
+    },
+    renderFilter (h, filterRender, params, context) {
+      let { options, optionGroups, optionProps = {}, optionGroupProps = {} } = filterRender
+      let { column } = params
+      let props = getProps(params, filterRender)
+      if (optionGroups) {
+        let groupOptions = optionGroupProps.options || 'options'
+        let groupLabel = optionGroupProps.label || 'label'
+        return column.filters.map(item => {
+          return h('Select', {
+            props,
+            model: {
+              value: item.data,
+              callback (optionValue) {
+                item.data = optionValue
+              }
+            },
+            on: getFilterEvents({
+              'on-change' (value) {
+                handleConfirmFilter(context, column, value && value.length > 0, item)
+              }
+            }, filterRender, params)
+          }, XEUtils.map(optionGroups, (group, gIndex) => {
+            return h('OptionGroup', {
+              props: {
+                label: group[groupLabel]
+              },
+              key: gIndex
+            }, renderOptions(h, group[groupOptions], optionProps))
+          }))
+        })
+      }
+      return column.filters.map(item => {
+        return h('Select', {
+          props,
+          model: {
+            value: item.data,
+            callback (optionValue) {
+              item.data = optionValue
+            }
+          },
+          on: getFilterEvents({
+            'on-change' (value) {
+              handleConfirmFilter(context, column, value && value.length > 0, item)
+            }
+          }, filterRender, params)
+        }, renderOptions(h, options, optionProps))
+      })
+    },
+    filterMethod ({ option, row, column }) {
+      let { data } = option
+      let { property, filterRender } = column
+      let { props = {} } = filterRender
+      let cellValue = XEUtils.get(row, property)
+      if (props.multiple) {
+        if (XEUtils.isArray(cellValue)) {
+          return XEUtils.includeArrays(cellValue, data)
+        }
+        return data.indexOf(cellValue) > -1
+      }
+      return cellValue === data
     }
   },
   Cascader: {
@@ -256,11 +314,8 @@ const renderMap = {
       return cellText(h, cellValue)
     },
     renderFilter (h, filterRender, params, context) {
-      let { $table, column } = params
-      let { props } = filterRender
-      if ($table.vSize) {
-        props = XEUtils.assign({ size: $table.vSize }, props)
-      }
+      let { column } = params
+      let props = getProps(params, filterRender)
       return column.filters.map(item => {
         return h(filterRender.name, {
           props,
@@ -272,8 +327,7 @@ const renderMap = {
           },
           on: getFilterEvents({
             'on-change' (value) {
-              // 当前的选项是否选中，如果有值就是选中了，需要进行筛选
-              context[column.filterMultiple ? 'changeMultipleOption' : 'changeRadioOption']({}, value && value.length > 0, item)
+              handleConfirmFilter(context, column, !!value, item)
             }
           }, filterRender, params)
         })
@@ -309,9 +363,9 @@ const renderMap = {
 }
 
 /**
- * 筛选兼容性处理
+ * 事件兼容性处理
  */
-function handleClearFilterEvent (params, evnt, context) {
+function handleClearEvent (params, evnt, context) {
   let { getEventTargetNode } = context
   if (
     // 下拉框、日期
@@ -321,27 +375,14 @@ function handleClearFilterEvent (params, evnt, context) {
   }
 }
 
-/**
- * 单元格兼容性处理
- */
-function handleClearActivedEvent (params, evnt, context) {
-  let { getEventTargetNode } = context
-  if (
-    // 下拉框、日期
-    getEventTargetNode(evnt, document.body, 'ivu-select-dropdown').flag
-  ) {
-    return false
+const VXETablePluginIView = {
+  install ({ interceptor, renderer }) {
+    // 添加到渲染器
+    renderer.mixin(renderMap)
+    // 处理事件冲突
+    interceptor.add('event.clear_filter', handleClearEvent)
+    interceptor.add('event.clear_actived', handleClearEvent)
   }
-}
-
-function VXETablePluginIView () {}
-
-VXETablePluginIView.install = function ({ interceptor, renderer }) {
-  // 添加到渲染器
-  renderer.mixin(renderMap)
-  // 处理事件冲突
-  interceptor.add('event.clear_filter', handleClearFilterEvent)
-  interceptor.add('event.clear_actived', handleClearActivedEvent)
 }
 
 if (typeof window !== 'undefined' && window.VXETable) {

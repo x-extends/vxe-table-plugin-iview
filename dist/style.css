@@ -14,6 +14,12 @@
   border: 0;
   box-shadow: none; }
 
+.vxe-table-iview .vxe-table--filter-body > .ivu-input-wrapper,
+.vxe-table-iview .vxe-table--filter-body > .ivu-input-number,
+.vxe-table-iview .vxe-table--filter-body > .ivu-select,
+.vxe-table-iview .vxe-table--filter-body > .ivu-date-picker {
+  width: 180px; }
+
 .vxe-table-iview .vxe-cell > .ivu-input-wrapper,
 .vxe-table-iview .vxe-cell > .ivu-input-number,
 .vxe-table-iview .vxe-cell > .ivu-select,

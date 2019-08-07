@@ -1,10 +1,10 @@
-export interface VXETablePluginIViewOptions {
-
+export interface VXETablePluginIViewStatic {
+  install(vue: typeof Vue): void;
 }
 
 /**
  * vxe-table renderer plugins for iview.
  */
-declare var VXETablePluginIView: VXETablePluginIViewOptions;
+declare var VXETablePluginIView: VXETablePluginIViewStatic;
 
 export default VXETablePluginIView;

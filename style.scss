@@ -3,35 +3,43 @@
   box-shadow: none;
 }
 .vxe-table-iview {
+  .vxe-table--filter-body {
+    & > .ivu-input-wrapper,
+    & > .ivu-input-number,
+    & > .ivu-select,
+    & > .ivu-date-picker {
+      width: 180px;
+    }
+  }
   .vxe-cell {
-    > .ivu-input-wrapper,
-    > .ivu-input-number,
-    > .ivu-select,
-    > .ivu-cascader,
-    > .ivu-date-picker-editor {
+    & > .ivu-input-wrapper,
+    & > .ivu-input-number,
+    & > .ivu-select,
+    & > .ivu-cascader,
+    & > .ivu-date-picker-editor {
       width: 100%;
     }
   }
   &.c--highlight,
   .vxe-table.c--highlight {
     .vxe-cell {
-      > .ivu-input-wrapper,
-      > .ivu-auto-complete,
-      > .ivu-cascader,
-      > .ivu-date-picker {
+      & > .ivu-input-wrapper,
+      & > .ivu-auto-complete,
+      & > .ivu-cascader,
+      & > .ivu-date-picker {
         .ivu-input {
           padding: 0;
           @extend %ResetBorder;
         }
       }
-      > .ivu-input-number {
+      & > .ivu-input-number {
         @extend %ResetBorder;
         .ivu-input-number-handler-wrap,
         .ivu-input-number-handler-down {
           @extend %ResetBorder;
         }
       }
-      > .ivu-select {
+      & > .ivu-select {
         .ivu-select-selection {
           @extend %ResetBorder;
         }
