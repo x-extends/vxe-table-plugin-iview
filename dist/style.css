@@ -17,7 +17,8 @@
 .vxe-table-iview .vxe-table--filter-body > .ivu-input-wrapper,
 .vxe-table-iview .vxe-table--filter-body > .ivu-input-number,
 .vxe-table-iview .vxe-table--filter-body > .ivu-select,
-.vxe-table-iview .vxe-table--filter-body > .ivu-date-picker {
+.vxe-table-iview .vxe-table--filter-body > .ivu-date-picker,
+.vxe-table-iview .vxe-table--filter-body > .ivu-rate {
   width: 180px; }
 
 .vxe-table-iview .vxe-cell > .ivu-input-wrapper,
@@ -26,6 +27,11 @@
 .vxe-table-iview .vxe-cell > .ivu-cascader,
 .vxe-table-iview .vxe-cell > .ivu-date-picker-editor {
   width: 100%; }
+
+.vxe-table-iview .vxe-cell > .ivu-rate {
+  height: 22px;
+  line-height: 22px;
+  vertical-align: bottom; }
 
 .vxe-table-iview.c--highlight .vxe-cell > .ivu-input-wrapper .ivu-input,
 .vxe-table-iview.c--highlight .vxe-cell > .ivu-auto-complete .ivu-input,

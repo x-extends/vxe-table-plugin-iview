@@ -6,12 +6,12 @@
 [![gzip size: CSS](http://img.badgesize.io/https://unpkg.com/vxe-table-plugin-iview/dist/style.min.css?compression=gzip&label=gzip%20size:%20CSS)](https://unpkg.com/vxe-table-plugin-iview/dist/style.min.css)
 [![npm license](https://img.shields.io/github/license/mashape/apistatus.svg)](https://github.com/xuliangzhan/vxe-table-plugin-iview/blob/master/LICENSE)
 
-该插件用于在 vxe-table 表格中适配 iview 组件的渲染
+该插件用于在 [vxe-table](https://github.com/xuliangzhan/vxe-table) 的渲染器中适配 [iview](https://www.npmjs.com/package/iview)
 
 ## Installing
 
 ```shell
-npm install xe-utils vxe-table vxe-table-plugin-iview
+npm install xe-utils vxe-table vxe-table-plugin-iview iview
 ```
 
 ```javascript
@@ -42,7 +42,7 @@ VXETable.use(VXETablePluginIView)
 
 | 属性 | 描述 | 类型 | 可选值 | 默认值 |
 |------|------|-----|-----|-----|
-| name | 支持的渲染组件 | String | Input, AutoComplete, InputNumber, Select | — |
+| name | 支持的渲染组件 | String | Input, AutoComplete, InputNumber, Select, Rate, iSwitch | — |
 | props | 渲染组件附加属性，参数请查看被渲染的 Component props | Object | — | {} |
 | options | 只对 name=Select 有效，下拉组件选项列表 | Array | — | [] |
 | optionProps | 只对 name=Select 有效，下拉组件选项属性参数配置 | Object | — | { value: 'value', label: 'label' } |

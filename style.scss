@@ -7,7 +7,8 @@
     & > .ivu-input-wrapper,
     & > .ivu-input-number,
     & > .ivu-select,
-    & > .ivu-date-picker {
+    & > .ivu-date-picker,
+    & > .ivu-rate {
       width: 180px;
     }
   }
@@ -18,6 +19,11 @@
     & > .ivu-cascader,
     & > .ivu-date-picker-editor {
       width: 100%;
+    }
+    & > .ivu-rate {
+      height: 22px;
+      line-height: 22px;
+      vertical-align: bottom;
     }
   }
   &.c--highlight,

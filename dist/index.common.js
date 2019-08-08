@@ -70,9 +70,11 @@ function getCellEvents(editRender, params) {
 function defaultCellRender(h, editRender, params) {
   var row = params.row,
       column = params.column;
+  var attrs = editRender.attrs;
   var props = getProps(params, editRender);
   return [h(editRender.name, {
     props: props,
+    attrs: attrs,
     model: {
       value: _xeUtils["default"].get(row, column.property),
       callback: function callback(value) {
@@ -99,12 +101,14 @@ function getFilterEvents(on, filterRender, params) {
 
 function defaultFilterRender(h, filterRender, params, context) {
   var column = params.column;
-  var name = filterRender.name;
+  var name = filterRender.name,
+      attrs = filterRender.attrs;
   var type = 'on-change';
   var props = getProps(params, filterRender);
   return column.filters.map(function (item) {
     return h(name, {
       props: props,
+      attrs: attrs,
       model: {
         value: item.data,
         callback: function callback(optionValue) {
@@ -184,6 +188,7 @@ var renderMap = {
           optionGroupProps = _editRender$optionGro === void 0 ? {} : _editRender$optionGro;
       var row = params.row,
           column = params.column;
+      var attrs = editRender.attrs;
       var props = getProps(params, editRender);
 
       if (optionGroups) {
@@ -191,6 +196,7 @@ var renderMap = {
         var groupLabel = optionGroupProps.label || 'label';
         return [h('Select', {
           props: props,
+          attrs: attrs,
           model: {
             value: _xeUtils["default"].get(row, column.property),
             callback: function callback(cellValue) {
@@ -210,6 +216,7 @@ var renderMap = {
 
       return [h('Select', {
         props: props,
+        attrs: attrs,
         model: {
           value: _xeUtils["default"].get(row, column.property),
           callback: function callback(cellValue) {
@@ -270,6 +277,7 @@ var renderMap = {
           _filterRender$optionG = filterRender.optionGroupProps,
           optionGroupProps = _filterRender$optionG === void 0 ? {} : _filterRender$optionG;
       var column = params.column;
+      var attrs = filterRender.attrs;
       var props = getProps(params, filterRender);
 
       if (optionGroups) {
@@ -278,6 +286,7 @@ var renderMap = {
         return column.filters.map(function (item) {
           return h('Select', {
             props: props,
+            attrs: attrs,
             model: {
               value: item.data,
               callback: function callback(optionValue) {
@@ -303,6 +312,7 @@ var renderMap = {
       return column.filters.map(function (item) {
         return h('Select', {
           props: props,
+          attrs: attrs,
           model: {
             value: item.data,
             callback: function callback(optionValue) {
@@ -401,10 +411,12 @@ var renderMap = {
     },
     renderFilter: function renderFilter(h, filterRender, params, context) {
       var column = params.column;
+      var attrs = filterRender.attrs;
       var props = getProps(params, filterRender);
       return column.filters.map(function (item) {
         return h(filterRender.name, {
           props: props,
+          attrs: attrs,
           model: {
             value: item.data,
             callback: function callback(optionValue) {
@@ -450,10 +462,14 @@ var renderMap = {
     renderEdit: defaultCellRender
   },
   Rate: {
-    renderEdit: defaultCellRender
+    renderEdit: defaultCellRender,
+    renderFilter: defaultFilterRender,
+    filterMethod: defaultFilterMethod
   },
   iSwitch: {
-    renderEdit: defaultCellRender
+    renderEdit: defaultCellRender,
+    renderFilter: defaultFilterRender,
+    filterMethod: defaultFilterMethod
   }
   /**
    * 事件兼容性处理
