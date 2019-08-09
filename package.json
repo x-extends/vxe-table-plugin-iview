@@ -1,6 +1,6 @@
 {
   "name": "vxe-table-plugin-iview",
-  "version": "1.3.2",
+  "version": "1.3.3",
   "description": "vxe-table renderer plugins for iview.",
   "scripts": {
     "lib": "gulp build"
