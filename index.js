@@ -389,9 +389,10 @@ const renderMap = {
  */
 function handleClearEvent (params, evnt, context) {
   let { getEventTargetNode } = context
+  let bodyElem = document.body
   if (
     // 下拉框、日期
-    getEventTargetNode(evnt, document.body, 'ivu-select-dropdown').flag
+    getEventTargetNode(evnt, bodyElem, 'ivu-select-dropdown').flag
   ) {
     return false
   }

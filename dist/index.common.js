@@ -488,9 +488,10 @@ var renderMap = {
 
 function handleClearEvent(params, evnt, context) {
   var getEventTargetNode = context.getEventTargetNode;
+  var bodyElem = document.body;
 
   if ( // 下拉框、日期
-  getEventTargetNode(evnt, document.body, 'ivu-select-dropdown').flag) {
+  getEventTargetNode(evnt, bodyElem, 'ivu-select-dropdown').flag) {
     return false;
   }
 }
