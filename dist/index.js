@@ -508,10 +508,6 @@
     }
   }
 
-  var eventMap = {
-    'event.clear_filter': handleClearEvent,
-    'event.clear_actived': handleClearEvent
-  };
   var VXETablePluginIView = {
     install: function install(_ref8) {
       var interceptor = _ref8.interceptor,
@@ -519,7 +515,8 @@
       // 添加到渲染器
       renderer.mixin(renderMap); // 处理事件冲突
 
-      interceptor.mixin(eventMap);
+      interceptor.add('event.clear_filter', handleClearEvent);
+      interceptor.add('event.clear_actived', handleClearEvent);
     }
   };
 
