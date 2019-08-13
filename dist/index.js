@@ -16,7 +16,7 @@
   Object.defineProperty(_exports, "__esModule", {
     value: true
   });
-  _exports["default"] = void 0;
+  _exports["default"] = _exports.VXETablePluginIView = void 0;
   _xeUtils = _interopRequireDefault(_xeUtils);
 
   function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
@@ -519,6 +519,7 @@
       interceptor.add('event.clear_actived', handleClearEvent);
     }
   };
+  _exports.VXETablePluginIView = VXETablePluginIView;
 
   if (typeof window !== 'undefined' && window.VXETable) {
     window.VXETable.use(VXETablePluginIView);

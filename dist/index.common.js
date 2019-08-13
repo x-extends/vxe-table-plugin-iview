@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports["default"] = void 0;
+exports["default"] = exports.VXETablePluginIView = void 0;
 
 var _xeUtils = _interopRequireDefault(require("xe-utils"));
 
@@ -507,6 +507,7 @@ var VXETablePluginIView = {
     interceptor.add('event.clear_actived', handleClearEvent);
   }
 };
+exports.VXETablePluginIView = VXETablePluginIView;
 
 if (typeof window !== 'undefined' && window.VXETable) {
   window.VXETable.use(VXETablePluginIView);
