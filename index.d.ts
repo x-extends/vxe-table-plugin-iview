@@ -1,12 +1,12 @@
 import VXETable from 'vxe-table'
 
-export interface VXETablePluginIViewStatic {
+export interface VXETablePluginStatic {
   install(xTable: typeof VXETable): void;
 }
 
 /**
  * vxe-table renderer plugins for iview.
  */
-declare var VXETablePluginIView: VXETablePluginIViewStatic;
+declare var VXETablePluginIView: VXETablePluginStatic;
 
 export default VXETablePluginIView;
