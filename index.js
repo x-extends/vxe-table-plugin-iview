@@ -399,7 +399,8 @@ function handleClearEvent (params, evnt, context) {
 }
 
 export const VXETablePluginIView = {
-  install ({ interceptor, renderer }) {
+  install (VXETable) {
+    let { interceptor, renderer } = VXETable
     renderer.mixin(renderMap)
     interceptor.add('event.clear_filter', handleClearEvent)
     interceptor.add('event.clear_actived', handleClearEvent)
