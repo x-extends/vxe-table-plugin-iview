@@ -5,7 +5,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports["default"] = exports.VXETablePluginIView = void 0;
 
-var _xeUtils = _interopRequireDefault(require("xe-utils"));
+var _xeUtils = _interopRequireDefault(require("xe-utils/methods/xe-utils"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
@@ -497,9 +497,9 @@ function handleClearEvent(params, evnt, context) {
 }
 
 var VXETablePluginIView = {
-  install: function install(_ref8) {
-    var interceptor = _ref8.interceptor,
-        renderer = _ref8.renderer;
+  install: function install(VXETable) {
+    var interceptor = VXETable.interceptor,
+        renderer = VXETable.renderer;
     renderer.mixin(renderMap);
     interceptor.add('event.clear_filter', handleClearEvent);
     interceptor.add('event.clear_actived', handleClearEvent);
