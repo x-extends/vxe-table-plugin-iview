@@ -1,5 +1,6 @@
 # vxe-table-plugin-iview
 
+[![gitee star](https://gitee.com/xuliangzhan_admin/vxe-table-plugin-iview/badge/star.svg?theme=dark)](https://gitee.com/xuliangzhan_admin/vxe-table-plugin-iview/stargazers)
 [![npm version](https://img.shields.io/npm/v/vxe-table-plugin-iview.svg?style=flat-square)](https://www.npmjs.org/package/vxe-table-plugin-iview)
 [![npm downloads](https://img.shields.io/npm/dm/vxe-table-plugin-iview.svg?style=flat-square)](http://npm-stat.com/charts.html?package=vxe-table-plugin-iview)
 [![gzip size: JS](http://img.badgesize.io/https://unpkg.com/vxe-table-plugin-iview/dist/index.min.js?compression=gzip&label=gzip%20size:%20JS)](https://unpkg.com/vxe-table-plugin-iview/dist/index.min.js)
