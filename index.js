@@ -44,7 +44,7 @@ function getCellEvents (renderOpts, params) {
   return on
 }
 
-function defaultCellRender (h, renderOpts, params) {
+function defaultEditRender (h, renderOpts, params) {
   let { row, column } = params
   let { attrs } = renderOpts
   let props = getProps(params, renderOpts)
@@ -132,22 +132,22 @@ function cellText (h, cellValue) {
 const renderMap = {
   Input: {
     autofocus: 'input.ivu-input',
-    renderDefault: defaultCellRender,
-    renderEdit: defaultCellRender,
+    renderDefault: defaultEditRender,
+    renderEdit: defaultEditRender,
     renderFilter: defaultFilterRender,
     filterMethod: defaultFilterMethod
   },
   AutoComplete: {
     autofocus: 'input.ivu-input',
-    renderDefault: defaultCellRender,
-    renderEdit: defaultCellRender,
+    renderDefault: defaultEditRender,
+    renderEdit: defaultEditRender,
     renderFilter: defaultFilterRender,
     filterMethod: defaultFilterMethod
   },
   InputNumber: {
     autofocus: 'input.ivu-input-number-input',
-    renderDefault: defaultCellRender,
-    renderEdit: defaultCellRender,
+    renderDefault: defaultEditRender,
+    renderEdit: defaultEditRender,
     renderFilter: defaultFilterRender,
     filterMethod: defaultFilterMethod
   },
@@ -286,7 +286,7 @@ const renderMap = {
     }
   },
   Cascader: {
-    renderEdit: defaultCellRender,
+    renderEdit: defaultEditRender,
     renderCell (h, { props = {} }, params) {
       let { row, column } = params
       let cellValue = XEUtils.get(row, column.property)
@@ -297,7 +297,7 @@ const renderMap = {
     }
   },
   DatePicker: {
-    renderEdit: defaultCellRender,
+    renderEdit: defaultEditRender,
     renderCell (h, { props = {} }, params) {
       let { row, column } = params
       let { separator } = props
@@ -368,17 +368,17 @@ const renderMap = {
     }
   },
   TimePicker: {
-    renderEdit: defaultCellRender
+    renderEdit: defaultEditRender
   },
   Rate: {
-    renderDefault: defaultCellRender,
-    renderEdit: defaultCellRender,
+    renderDefault: defaultEditRender,
+    renderEdit: defaultEditRender,
     renderFilter: defaultFilterRender,
     filterMethod: defaultFilterMethod
   },
   iSwitch: {
-    renderDefault: defaultCellRender,
-    renderEdit: defaultCellRender,
+    renderDefault: defaultEditRender,
+    renderEdit: defaultEditRender,
     renderFilter: defaultFilterRender,
     filterMethod: defaultFilterMethod
   }
