@@ -406,8 +406,8 @@ export const VXETablePluginIView = {
   install (xtable: typeof VXETable) {
     let { interceptor, renderer } = xtable
     renderer.mixin(renderMap)
-    interceptor.add('event.clear_filter', handleClearEvent)
-    interceptor.add('event.clear_actived', handleClearEvent)
+    interceptor.add('event.clearFilter', handleClearEvent)
+    interceptor.add('event.clearActived', handleClearEvent)
   }
 }
 
