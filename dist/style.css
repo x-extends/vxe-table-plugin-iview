@@ -33,6 +33,15 @@
   line-height: 22px;
   vertical-align: bottom; }
 
+.vxe-table-iview .col--valid-error > .vxe-cell > .ivu-input-wrapper .ivu-input,
+.vxe-table-iview .col--valid-error > .vxe-cell > .ivu-auto-complete .ivu-input,
+.vxe-table-iview .col--valid-error > .vxe-cell > .ivu-input-number,
+.vxe-table-iview .col--valid-error > .vxe-cell > .ivu-select .ivu-select-selection,
+.vxe-table-iview .col--valid-error > .vxe-cell > .ivu-cascader .ivu-input,
+.vxe-table-iview .col--valid-error > .vxe-cell > .ivu-date-picker .ivu-input {
+  border-color: #f56c6c;
+  box-shadow: none; }
+
 .vxe-table-iview.c--highlight .vxe-cell > .ivu-input-wrapper .ivu-input,
 .vxe-table-iview.c--highlight .vxe-cell > .ivu-auto-complete .ivu-input,
 .vxe-table-iview.c--highlight .vxe-cell > .ivu-cascader .ivu-input,
