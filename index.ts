@@ -38,9 +38,13 @@ function getCellEvents (renderOpts: any, params: any) {
     [type]: () => $table.updateStatus(params)
   }
   if (events) {
-    XEUtils.assign(on, XEUtils.objectMap(events, (cb: Function) => function (...args: any[]) {
-      cb.apply(null, [params].concat.apply(params, args))
-    }))
+    XEUtils.assign(
+      {}, 
+      XEUtils.objectMap(events, (cb: Function) => function (...args: any[]) {
+        cb.apply(null, [params].concat.apply(params, args))
+      }),
+      on
+    )
   }
   return on
 }
@@ -67,16 +71,16 @@ function defaultEditRender (h: Function, renderOpts: any, params: any) {
 function getFilterEvents (on: any, renderOpts: any, params: any) {
   let { events } = renderOpts
   if (events) {
-    XEUtils.assign(on, XEUtils.objectMap(events, (cb: Function) => function (...args: any[]) {
+    XEUtils.assign({}, XEUtils.objectMap(events, (cb: Function) => function (...args: any[]) {
       cb.apply(null, [params].concat.apply(params, args))
-    }))
+    }), on)
   }
   return on
 }
 
 function defaultFilterRender (h: Function, renderOpts: any, params: any, context: any) {
   let { column } = params
-  let { name, attrs } = renderOpts
+  let { name, attrs, events } = renderOpts
   let type = 'on-change'
   let props = getProps(params, renderOpts)
   return column.filters.map((item: any) => {
@@ -90,8 +94,11 @@ function defaultFilterRender (h: Function, renderOpts: any, params: any, context
         }
       },
       on: getFilterEvents({
-        [type] () {
+        [type] (evnt: any) {
           handleConfirmFilter(context, column, !!item.data, item)
+          if (events && events[type]) {
+            events[type](params, evnt)
+          }
         }
       }, renderOpts, params)
     })
@@ -223,8 +230,9 @@ const renderMap = {
     renderFilter (h: Function, renderOpts: any, params: any, context: any) {
       let { options, optionGroups, optionProps = {}, optionGroupProps = {} } = renderOpts
       let { column } = params
-      let { attrs } = renderOpts
+      let { attrs, events } = renderOpts
       let props = getProps(params, renderOpts)
+      let type = 'on-change'
       if (optionGroups) {
         let groupOptions = optionGroupProps.options || 'options'
         let groupLabel = optionGroupProps.label || 'label'
@@ -239,8 +247,11 @@ const renderMap = {
               }
             },
             on: getFilterEvents({
-              'on-change' (value: any) {
+              [type] (value: any) {
                 handleConfirmFilter(context, column, value && value.length > 0, item)
+                if (events && events[type]) {
+                  events[type](params, value)
+                }
               }
             }, renderOpts, params)
           }, XEUtils.map(optionGroups, (group: any, gIndex: number) => {
@@ -264,8 +275,11 @@ const renderMap = {
             }
           },
           on: getFilterEvents({
-            'on-change' (value: any) {
+            [type] (value: any) {
               handleConfirmFilter(context, column, value && value.length > 0, item)
+              if (events && events[type]) {
+                events[type](params, value)
+              }
             }
           }, renderOpts, params)
         }, renderOptions(h, options, optionProps))
@@ -330,8 +344,9 @@ const renderMap = {
     },
     renderFilter (h: Function, renderOpts: any, params: any, context: any) {
       let { column } = params
-      let { attrs } = renderOpts
+      let { attrs, events } = renderOpts
       let props = getProps(params, renderOpts)
+      let type = 'on-change'
       return column.filters.map((item: any) => {
         return h(renderOpts.name, {
           props,
@@ -343,8 +358,11 @@ const renderMap = {
             }
           },
           on: getFilterEvents({
-            'on-change' (value: any) {
+            [type] (value: any) {
               handleConfirmFilter(context, column, !!value, item)
+              if (events && events[type]) {
+                events[type](params, value)
+              }
             }
           }, renderOpts, params)
         })

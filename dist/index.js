@@ -69,7 +69,7 @@
     });
 
     if (events) {
-      _xeUtils["default"].assign(on, _xeUtils["default"].objectMap(events, function (cb) {
+      _xeUtils["default"].assign({}, _xeUtils["default"].objectMap(events, function (cb) {
         return function () {
           for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
             args[_key] = arguments[_key];
@@ -77,7 +77,7 @@
 
           cb.apply(null, [params].concat.apply(params, args));
         };
-      }));
+      }), on);
     }
 
     return on;
@@ -105,7 +105,7 @@
     var events = renderOpts.events;
 
     if (events) {
-      _xeUtils["default"].assign(on, _xeUtils["default"].objectMap(events, function (cb) {
+      _xeUtils["default"].assign({}, _xeUtils["default"].objectMap(events, function (cb) {
         return function () {
           for (var _len2 = arguments.length, args = new Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
             args[_key2] = arguments[_key2];
@@ -113,7 +113,7 @@
 
           cb.apply(null, [params].concat.apply(params, args));
         };
-      }));
+      }), on);
     }
 
     return on;
@@ -122,7 +122,8 @@
   function defaultFilterRender(h, renderOpts, params, context) {
     var column = params.column;
     var name = renderOpts.name,
-        attrs = renderOpts.attrs;
+        attrs = renderOpts.attrs,
+        events = renderOpts.events;
     var type = 'on-change';
     var props = getProps(params, renderOpts);
     return column.filters.map(function (item) {
@@ -135,8 +136,12 @@
             item.data = optionValue;
           }
         },
-        on: getFilterEvents(_defineProperty({}, type, function () {
+        on: getFilterEvents(_defineProperty({}, type, function (evnt) {
           handleConfirmFilter(context, column, !!item.data, item);
+
+          if (events && events[type]) {
+            events[type](params, evnt);
+          }
         }), renderOpts, params)
       });
     });
@@ -302,8 +307,10 @@
             _renderOpts$optionGro3 = renderOpts.optionGroupProps,
             optionGroupProps = _renderOpts$optionGro3 === void 0 ? {} : _renderOpts$optionGro3;
         var column = params.column;
-        var attrs = renderOpts.attrs;
+        var attrs = renderOpts.attrs,
+            events = renderOpts.events;
         var props = getProps(params, renderOpts);
+        var type = 'on-change';
 
         if (optionGroups) {
           var groupOptions = optionGroupProps.options || 'options';
@@ -318,11 +325,13 @@
                   item.data = optionValue;
                 }
               },
-              on: getFilterEvents({
-                'on-change': function onChange(value) {
-                  handleConfirmFilter(context, column, value && value.length > 0, item);
+              on: getFilterEvents(_defineProperty({}, type, function (value) {
+                handleConfirmFilter(context, column, value && value.length > 0, item);
+
+                if (events && events[type]) {
+                  events[type](params, value);
                 }
-              }, renderOpts, params)
+              }), renderOpts, params)
             }, _xeUtils["default"].map(optionGroups, function (group, gIndex) {
               return h('OptionGroup', {
                 props: {
@@ -344,11 +353,13 @@
                 item.data = optionValue;
               }
             },
-            on: getFilterEvents({
-              'on-change': function onChange(value) {
-                handleConfirmFilter(context, column, value && value.length > 0, item);
+            on: getFilterEvents(_defineProperty({}, type, function (value) {
+              handleConfirmFilter(context, column, value && value.length > 0, item);
+
+              if (events && events[type]) {
+                events[type](params, value);
               }
-            }, renderOpts, params)
+            }), renderOpts, params)
           }, renderOptions(h, options, optionProps));
         });
       },
@@ -438,8 +449,10 @@
       },
       renderFilter: function renderFilter(h, renderOpts, params, context) {
         var column = params.column;
-        var attrs = renderOpts.attrs;
+        var attrs = renderOpts.attrs,
+            events = renderOpts.events;
         var props = getProps(params, renderOpts);
+        var type = 'on-change';
         return column.filters.map(function (item) {
           return h(renderOpts.name, {
             props: props,
@@ -450,11 +463,13 @@
                 item.data = optionValue;
               }
             },
-            on: getFilterEvents({
-              'on-change': function onChange(value) {
-                handleConfirmFilter(context, column, !!value, item);
+            on: getFilterEvents(_defineProperty({}, type, function (value) {
+              handleConfirmFilter(context, column, !!value, item);
+
+              if (events && events[type]) {
+                events[type](params, value);
               }
-            }, renderOpts, params)
+            }), renderOpts, params)
           });
         });
       },
