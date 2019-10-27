@@ -34,7 +34,7 @@ VXETable.use(VXETablePluginIView)
 | name | 支持的渲染组件 | String | Input, AutoComplete, InputNumber, Rate, iSwitch | — |
 | props | 渲染组件附加属性，参数请查看被渲染的 Component props | Object | — | {} |
 | options | 只对 name=Select 有效，下拉组件选项列表 | Array | — | [] |
-| optionProps | 只对 name=Select 有效，下拉组件选项属性参数配置 | Object | — | { value: 'value', label: 'label' } |
+| optionProps | 只对 name=Select 有效，下拉组件选项属性参数配置 | Object | — | { value: 'value', label: 'label', disabled: 'disabled' } |
 | optionGroups | 只对 name=ElSelect 有效，下拉组件分组选项列表 | Array | — | [] |
 | optionGroupProps | 只对 name=ElSelect 有效，下拉组件分组选项属性参数配置 | Object | — | { options: 'options', label: 'label' } |
 | events | 渲染组件附加事件，参数为 ( {row,rowIndex,column,columnIndex}, ...Component arguments ) | Object | — | — |
@@ -46,7 +46,7 @@ VXETable.use(VXETablePluginIView)
 | name | 支持的渲染组件 | String | Input, AutoComplete, InputNumber, Select, Cascader, DatePicker, TimePicker, Rate, iSwitch | — |
 | props | 渲染组件附加属性，参数请查看被渲染的 Component props | Object | — | {} |
 | options | 只对 name=Select 有效，下拉组件选项列表 | Array | — | [] |
-| optionProps | 只对 name=Select 有效，下拉组件选项属性参数配置 | Object | — | { value: 'value', label: 'label' } |
+| optionProps | 只对 name=Select 有效，下拉组件选项属性参数配置 | Object | — | { value: 'value', label: 'label', disabled: 'disabled' } |
 | optionGroups | 只对 name=ElSelect 有效，下拉组件分组选项列表 | Array | — | [] |
 | optionGroupProps | 只对 name=ElSelect 有效，下拉组件分组选项属性参数配置 | Object | — | { options: 'options', label: 'label' } |
 | events | 渲染组件附加事件，参数为 ( {row,rowIndex,column,columnIndex}, ...Component arguments ) | Object | — | — |
@@ -58,7 +58,7 @@ VXETable.use(VXETablePluginIView)
 | name | 支持的渲染组件 | String | Input, AutoComplete, InputNumber, Select, Rate, iSwitch | — |
 | props | 渲染组件附加属性，参数请查看被渲染的 Component props | Object | — | {} |
 | options | 只对 name=Select 有效，下拉组件选项列表 | Array | — | [] |
-| optionProps | 只对 name=Select 有效，下拉组件选项属性参数配置 | Object | — | { value: 'value', label: 'label' } |
+| optionProps | 只对 name=Select 有效，下拉组件选项属性参数配置 | Object | — | { value: 'value', label: 'label', disabled: 'disabled' } |
 | optionGroups | 只对 name=ElSelect 有效，下拉组件分组选项列表 | Array | — | [] |
 | optionGroupProps | 只对 name=ElSelect 有效，下拉组件分组选项属性参数配置 | Object | — | { options: 'options', label: 'label' } |
 | events | 渲染组件附加事件，参数为 ( {row,rowIndex,column,columnIndex}, ...Component arguments ) | Object | — | — |
