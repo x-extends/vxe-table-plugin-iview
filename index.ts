@@ -64,10 +64,11 @@ function defaultEditRender(h: Function, renderOpts: any, params: any) {
   ]
 }
 
-function getFilterEvents(on: any, renderOpts: any, params: any) {
+function getFilterEvents(on: any, renderOpts: any, params: any, context: any) {
   let { events } = renderOpts
   if (events) {
     return XEUtils.assign({}, XEUtils.objectMap(events, (cb: Function) => function (...args: any[]) {
+      params = Object.assign({ context }, params)
       cb.apply(null, [params].concat.apply(params, args))
     }), on)
   }
@@ -93,10 +94,10 @@ function defaultFilterRender(h: Function, renderOpts: any, params: any, context:
         [type](evnt: any) {
           handleConfirmFilter(context, column, !!item.data, item)
           if (events && events[type]) {
-            events[type](params, evnt)
+            events[type](Object.assign({ context }, params), evnt)
           }
         }
-      }, renderOpts, params)
+      }, renderOpts, params, context)
     })
   })
 }
@@ -248,10 +249,10 @@ const renderMap = {
               [type](value: any) {
                 handleConfirmFilter(context, column, value && value.length > 0, item)
                 if (events && events[type]) {
-                  events[type](params, value)
+                  events[type](Object.assign({ context }, params), value)
                 }
               }
-            }, renderOpts, params)
+            }, renderOpts, params, context)
           }, XEUtils.map(optionGroups, (group: any, gIndex: number) => {
             return h('OptionGroup', {
               props: {
@@ -276,10 +277,10 @@ const renderMap = {
             [type](value: any) {
               handleConfirmFilter(context, column, value && value.length > 0, item)
               if (events && events[type]) {
-                events[type](params, value)
+                events[type](Object.assign({ context }, params), value)
               }
             }
-          }, renderOpts, params)
+          }, renderOpts, params, context)
         }, renderOptions(h, options, optionProps))
       })
     },
@@ -359,10 +360,10 @@ const renderMap = {
             [type](value: any) {
               handleConfirmFilter(context, column, !!value, item)
               if (events && events[type]) {
-                events[type](params, value)
+                events[type](Object.assign({ context }, params), value)
               }
             }
-          }, renderOpts, params)
+          }, renderOpts, params, context)
         })
       })
     },
