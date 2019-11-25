@@ -51,12 +51,12 @@
     }
   }
 
-  function getProps(_ref, _ref2) {
+  function getProps(_ref, _ref2, defaultProps) {
     var $table = _ref.$table;
     var props = _ref2.props;
     return _xeUtils["default"].assign($table.vSize ? {
       size: $table.vSize
-    } : {}, props);
+    } : {}, defaultProps, props);
   }
 
   function getCellEvents(renderOpts, params) {
@@ -83,22 +83,24 @@
     return on;
   }
 
-  function defaultEditRender(h, renderOpts, params) {
-    var row = params.row,
-        column = params.column;
-    var attrs = renderOpts.attrs;
-    var props = getProps(params, renderOpts);
-    return [h(renderOpts.name, {
-      props: props,
-      attrs: attrs,
-      model: {
-        value: _xeUtils["default"].get(row, column.property),
-        callback: function callback(value) {
-          _xeUtils["default"].set(row, column.property, value);
-        }
-      },
-      on: getCellEvents(renderOpts, params)
-    })];
+  function createEditRender(defaultProps) {
+    return function (h, renderOpts, params) {
+      var row = params.row,
+          column = params.column;
+      var attrs = renderOpts.attrs;
+      var props = getProps(params, renderOpts, defaultProps);
+      return [h(renderOpts.name, {
+        props: props,
+        attrs: attrs,
+        model: {
+          value: _xeUtils["default"].get(row, column.property),
+          callback: function callback(value) {
+            _xeUtils["default"].set(row, column.property, value);
+          }
+        },
+        on: getCellEvents(renderOpts, params)
+      })];
+    };
   }
 
   function getFilterEvents(on, renderOpts, params, context) {
@@ -123,34 +125,36 @@
     return on;
   }
 
-  function defaultFilterRender(h, renderOpts, params, context) {
-    var column = params.column;
-    var name = renderOpts.name,
-        attrs = renderOpts.attrs,
-        events = renderOpts.events;
-    var type = 'on-change';
-    var props = getProps(params, renderOpts);
-    return column.filters.map(function (item) {
-      return h(name, {
-        props: props,
-        attrs: attrs,
-        model: {
-          value: item.data,
-          callback: function callback(optionValue) {
-            item.data = optionValue;
-          }
-        },
-        on: getFilterEvents(_defineProperty({}, type, function (evnt) {
-          handleConfirmFilter(context, column, !!item.data, item);
+  function createFilterRender(defaultProps) {
+    return function (h, renderOpts, params, context) {
+      var column = params.column;
+      var name = renderOpts.name,
+          attrs = renderOpts.attrs,
+          events = renderOpts.events;
+      var type = 'on-change';
+      var props = getProps(params, renderOpts);
+      return column.filters.map(function (item) {
+        return h(name, {
+          props: props,
+          attrs: attrs,
+          model: {
+            value: item.data,
+            callback: function callback(optionValue) {
+              item.data = optionValue;
+            }
+          },
+          on: getFilterEvents(_defineProperty({}, type, function (evnt) {
+            handleConfirmFilter(context, column, !!item.data, item);
 
-          if (events && events[type]) {
-            events[type](Object.assign({
-              context: context
-            }, params), evnt);
-          }
-        }), renderOpts, params, context)
+            if (events && events[type]) {
+              events[type](Object.assign({
+                context: context
+              }, params), evnt);
+            }
+          }), renderOpts, params, context)
+        });
       });
-    });
+    };
   }
 
   function handleConfirmFilter(context, column, checked, item) {
@@ -197,23 +201,23 @@
   var renderMap = {
     Input: {
       autofocus: 'input.ivu-input',
-      renderDefault: defaultEditRender,
-      renderEdit: defaultEditRender,
-      renderFilter: defaultFilterRender,
+      renderDefault: createEditRender(),
+      renderEdit: createEditRender(),
+      renderFilter: createFilterRender(),
       filterMethod: defaultFilterMethod
     },
     AutoComplete: {
       autofocus: 'input.ivu-input',
-      renderDefault: defaultEditRender,
-      renderEdit: defaultEditRender,
-      renderFilter: defaultFilterRender,
+      renderDefault: createEditRender(),
+      renderEdit: createEditRender(),
+      renderFilter: createFilterRender(),
       filterMethod: defaultFilterMethod
     },
     InputNumber: {
       autofocus: 'input.ivu-input-number-input',
-      renderDefault: defaultEditRender,
-      renderEdit: defaultEditRender,
-      renderFilter: defaultFilterRender,
+      renderDefault: createEditRender(),
+      renderEdit: createEditRender(),
+      renderFilter: createFilterRender(),
       filterMethod: defaultFilterMethod
     },
     Select: {
@@ -227,7 +231,9 @@
         var row = params.row,
             column = params.column;
         var attrs = renderOpts.attrs;
-        var props = getProps(params, renderOpts);
+        var props = getProps(params, renderOpts, {
+          transfer: true
+        });
 
         if (optionGroups) {
           var groupOptions = optionGroupProps.options || 'options';
@@ -317,7 +323,9 @@
         var column = params.column;
         var attrs = renderOpts.attrs,
             events = renderOpts.events;
-        var props = getProps(params, renderOpts);
+        var props = getProps(params, renderOpts, {
+          transfer: true
+        });
         var type = 'on-change';
 
         if (optionGroups) {
@@ -401,7 +409,9 @@
       }
     },
     Cascader: {
-      renderEdit: defaultEditRender,
+      renderEdit: createEditRender({
+        transfer: true
+      }),
       renderCell: function renderCell(h, _ref5, params) {
         var _ref5$props = _ref5.props,
             props = _ref5$props === void 0 ? {} : _ref5$props;
@@ -417,7 +427,9 @@
       }
     },
     DatePicker: {
-      renderEdit: defaultEditRender,
+      renderEdit: createEditRender({
+        transfer: true
+      }),
       renderCell: function renderCell(h, _ref6, params) {
         var _ref6$props = _ref6.props,
             props = _ref6$props === void 0 ? {} : _ref6$props;
@@ -463,7 +475,9 @@
         var column = params.column;
         var attrs = renderOpts.attrs,
             events = renderOpts.events;
-        var props = getProps(params, renderOpts);
+        var props = getProps(params, renderOpts, {
+          transfer: true
+        });
         var type = 'on-change';
         return column.filters.map(function (item) {
           return h(renderOpts.name, {
@@ -515,18 +529,20 @@
       }
     },
     TimePicker: {
-      renderEdit: defaultEditRender
+      renderEdit: createEditRender({
+        transfer: true
+      })
     },
     Rate: {
-      renderDefault: defaultEditRender,
-      renderEdit: defaultEditRender,
-      renderFilter: defaultFilterRender,
+      renderDefault: createEditRender(),
+      renderEdit: createEditRender(),
+      renderFilter: createFilterRender(),
       filterMethod: defaultFilterMethod
     },
     iSwitch: {
-      renderDefault: defaultEditRender,
-      renderEdit: defaultEditRender,
-      renderFilter: defaultFilterRender,
+      renderDefault: createEditRender(),
+      renderEdit: createEditRender(),
+      renderFilter: createFilterRender(),
       filterMethod: defaultFilterMethod
     }
   };

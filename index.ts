@@ -26,8 +26,8 @@ function matchCascaderData(index: number, list: Array<any>, values: Array<any>, 
   }
 }
 
-function getProps({ $table }: any, { props }: any) {
-  return XEUtils.assign($table.vSize ? { size: $table.vSize } : {}, props)
+function getProps({ $table }: any, { props }: any, defaultProps?: any) {
+  return XEUtils.assign($table.vSize ? { size: $table.vSize } : {}, defaultProps, props)
 }
 
 function getCellEvents(renderOpts: any, params: any) {
@@ -45,23 +45,25 @@ function getCellEvents(renderOpts: any, params: any) {
   return on
 }
 
-function defaultEditRender(h: Function, renderOpts: any, params: any) {
-  let { row, column } = params
-  let { attrs } = renderOpts
-  let props = getProps(params, renderOpts)
-  return [
-    h(renderOpts.name, {
-      props,
-      attrs,
-      model: {
-        value: XEUtils.get(row, column.property),
-        callback(value: any) {
-          XEUtils.set(row, column.property, value)
-        }
-      },
-      on: getCellEvents(renderOpts, params)
-    })
-  ]
+function createEditRender(defaultProps?: any) {
+  return function (h: Function, renderOpts: any, params: any) {
+    let { row, column } = params
+    let { attrs } = renderOpts
+    let props = getProps(params, renderOpts, defaultProps)
+    return [
+      h(renderOpts.name, {
+        props,
+        attrs,
+        model: {
+          value: XEUtils.get(row, column.property),
+          callback(value: any) {
+            XEUtils.set(row, column.property, value)
+          }
+        },
+        on: getCellEvents(renderOpts, params)
+      })
+    ]
+  }
 }
 
 function getFilterEvents(on: any, renderOpts: any, params: any, context: any) {
@@ -75,31 +77,33 @@ function getFilterEvents(on: any, renderOpts: any, params: any, context: any) {
   return on
 }
 
-function defaultFilterRender(h: Function, renderOpts: any, params: any, context: any) {
-  let { column } = params
-  let { name, attrs, events } = renderOpts
-  let type = 'on-change'
-  let props = getProps(params, renderOpts)
-  return column.filters.map((item: any) => {
-    return h(name, {
-      props,
-      attrs,
-      model: {
-        value: item.data,
-        callback(optionValue: any) {
-          item.data = optionValue
-        }
-      },
-      on: getFilterEvents({
-        [type](evnt: any) {
-          handleConfirmFilter(context, column, !!item.data, item)
-          if (events && events[type]) {
-            events[type](Object.assign({ context }, params), evnt)
+function createFilterRender(defaultProps?: any) {
+  return function (h: Function, renderOpts: any, params: any, context: any) {
+    let { column } = params
+    let { name, attrs, events } = renderOpts
+    let type = 'on-change'
+    let props = getProps(params, renderOpts)
+    return column.filters.map((item: any) => {
+      return h(name, {
+        props,
+        attrs,
+        model: {
+          value: item.data,
+          callback(optionValue: any) {
+            item.data = optionValue
           }
-        }
-      }, renderOpts, params, context)
+        },
+        on: getFilterEvents({
+          [type](evnt: any) {
+            handleConfirmFilter(context, column, !!item.data, item)
+            if (events && events[type]) {
+              events[type](Object.assign({ context }, params), evnt)
+            }
+          }
+        }, renderOpts, params, context)
+      })
     })
-  })
+  }
 }
 
 function handleConfirmFilter(context: any, column: any, checked: any, item: any) {
@@ -139,23 +143,23 @@ function cellText(h: Function, cellValue: any) {
 const renderMap = {
   Input: {
     autofocus: 'input.ivu-input',
-    renderDefault: defaultEditRender,
-    renderEdit: defaultEditRender,
-    renderFilter: defaultFilterRender,
+    renderDefault: createEditRender(),
+    renderEdit: createEditRender(),
+    renderFilter: createFilterRender(),
     filterMethod: defaultFilterMethod
   },
   AutoComplete: {
     autofocus: 'input.ivu-input',
-    renderDefault: defaultEditRender,
-    renderEdit: defaultEditRender,
-    renderFilter: defaultFilterRender,
+    renderDefault: createEditRender(),
+    renderEdit: createEditRender(),
+    renderFilter: createFilterRender(),
     filterMethod: defaultFilterMethod
   },
   InputNumber: {
     autofocus: 'input.ivu-input-number-input',
-    renderDefault: defaultEditRender,
-    renderEdit: defaultEditRender,
-    renderFilter: defaultFilterRender,
+    renderDefault: createEditRender(),
+    renderEdit: createEditRender(),
+    renderFilter: createFilterRender(),
     filterMethod: defaultFilterMethod
   },
   Select: {
@@ -163,7 +167,7 @@ const renderMap = {
       let { options, optionGroups, optionProps = {}, optionGroupProps = {} } = renderOpts
       let { row, column } = params
       let { attrs } = renderOpts
-      let props = getProps(params, renderOpts)
+      let props = getProps(params, renderOpts, { transfer: true })
       if (optionGroups) {
         let groupOptions = optionGroupProps.options || 'options'
         let groupLabel = optionGroupProps.label || 'label'
@@ -230,7 +234,7 @@ const renderMap = {
       let { options, optionGroups, optionProps = {}, optionGroupProps = {} } = renderOpts
       let { column } = params
       let { attrs, events } = renderOpts
-      let props = getProps(params, renderOpts)
+      let props = getProps(params, renderOpts, { transfer: true })
       let type = 'on-change'
       if (optionGroups) {
         let groupOptions = optionGroupProps.options || 'options'
@@ -300,7 +304,7 @@ const renderMap = {
     }
   },
   Cascader: {
-    renderEdit: defaultEditRender,
+    renderEdit: createEditRender({ transfer: true }),
     renderCell(h: Function, { props = {} }: any, params: any) {
       let { row, column } = params
       let cellValue = XEUtils.get(row, column.property)
@@ -311,7 +315,7 @@ const renderMap = {
     }
   },
   DatePicker: {
-    renderEdit: defaultEditRender,
+    renderEdit: createEditRender({ transfer: true }),
     renderCell(h: Function, { props = {} }: any, params: any) {
       let { row, column } = params
       let { separator } = props
@@ -344,7 +348,7 @@ const renderMap = {
     renderFilter(h: Function, renderOpts: any, params: any, context: any) {
       let { column } = params
       let { attrs, events } = renderOpts
-      let props = getProps(params, renderOpts)
+      let props = getProps(params, renderOpts, { transfer: true })
       let type = 'on-change'
       return column.filters.map((item: any) => {
         return h(renderOpts.name, {
@@ -386,18 +390,18 @@ const renderMap = {
     }
   },
   TimePicker: {
-    renderEdit: defaultEditRender
+    renderEdit: createEditRender({ transfer: true })
   },
   Rate: {
-    renderDefault: defaultEditRender,
-    renderEdit: defaultEditRender,
-    renderFilter: defaultFilterRender,
+    renderDefault: createEditRender(),
+    renderEdit: createEditRender(),
+    renderFilter: createFilterRender(),
     filterMethod: defaultFilterMethod
   },
   iSwitch: {
-    renderDefault: defaultEditRender,
-    renderEdit: defaultEditRender,
-    renderFilter: defaultFilterRender,
+    renderDefault: createEditRender(),
+    renderEdit: createEditRender(),
+    renderFilter: createFilterRender(),
     filterMethod: defaultFilterMethod
   }
 }
