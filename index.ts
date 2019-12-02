@@ -208,11 +208,28 @@ const renderMap = {
     },
     renderCell(h: Function, renderOpts: any, params: any) {
       let { options, optionGroups, props = {}, optionProps = {}, optionGroupProps = {} } = renderOpts
-      let { row, column } = params
+      let { $table, row, column } = params
       let labelProp = optionProps.label || 'label'
       let valueProp = optionProps.value || 'value'
       let groupOptions = optionGroupProps.options || 'options'
       let cellValue = XEUtils.get(row, column.property)
+      let colid: string = column.id
+      let rest: any
+      let cellData: any
+      if (props.remote) {
+        let fullAllDataRowMap: Map<any, any> = $table.fullAllDataRowMap
+        let cacheCell: any = fullAllDataRowMap.has(row)
+        if (cacheCell) {
+          rest = fullAllDataRowMap.get(row)
+          cellData = rest.cellData
+          if (!cellData) {
+            cellData = fullAllDataRowMap.get(row).cellData = {}
+          }
+        }
+        if (rest && cellData[colid] && cellData[colid].value === cellValue) {
+          return cellData[colid].label
+        }
+      }
       if (!(cellValue === null || cellValue === undefined || cellValue === '')) {
         return cellText(h, XEUtils.map(props.multiple ? cellValue : [cellValue], optionGroups ? (value: any) => {
           let selectItem
@@ -222,10 +239,18 @@ const renderMap = {
               break
             }
           }
-          return selectItem ? selectItem[labelProp] : null
+          let cellLabel: any = selectItem ? selectItem[labelProp] : value
+          if (cellData && options && options.length) {
+            cellData[colid] = { value: cellValue, label: cellLabel }
+          }
+          return cellLabel
         } : (value: any) => {
           let selectItem = XEUtils.find(options, (item: any) => item[valueProp] === value)
-          return selectItem ? selectItem[labelProp] : null
+          let cellLabel: any = selectItem ? selectItem[labelProp] : value
+          if (cellData && options && options.length) {
+            cellData[colid] = { value: cellValue, label: cellLabel }
+          }
+          return cellLabel
         }).join(';'))
       }
       return cellText(h, '')
