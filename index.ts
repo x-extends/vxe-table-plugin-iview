@@ -216,7 +216,7 @@ const renderMap = {
       let colid: string = column.id
       let rest: any
       let cellData: any
-      if (props.remote) {
+      if (props.filterable) {
         let fullAllDataRowMap: Map<any, any> = $table.fullAllDataRowMap
         let cacheCell: any = fullAllDataRowMap.has(row)
         if (cacheCell) {
