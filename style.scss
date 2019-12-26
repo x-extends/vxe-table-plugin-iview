@@ -15,7 +15,8 @@ $vxe-table-validate-error-color: #f56c6c;
       width: 180px;
     }
   }
-  .vxe-cell {
+  .vxe-cell,
+  .vxe-tree-cell {
     & > .ivu-input-wrapper,
     & > .ivu-input-number,
     & > .ivu-select,
@@ -30,7 +31,8 @@ $vxe-table-validate-error-color: #f56c6c;
     }
   }
   .col--valid-error {
-    & > .vxe-cell {
+    & > .vxe-cell,
+    & > .vxe-tree-cell {
       & > .ivu-input-wrapper .ivu-input,
       & > .ivu-auto-complete .ivu-input,
       & > .ivu-input-number,
@@ -44,7 +46,8 @@ $vxe-table-validate-error-color: #f56c6c;
   }
   &.c--highlight,
   .vxe-table.c--highlight {
-    .vxe-cell {
+    .vxe-cell,
+    .vxe-tree-cell {
       & > .ivu-input-wrapper,
       & > .ivu-auto-complete,
       & > .ivu-cascader,
