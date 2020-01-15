@@ -1,20 +1,20 @@
 import XEUtils from 'xe-utils/methods/xe-utils'
 import VXETable from 'vxe-table/lib/vxe-table'
 
-function getFormatDate(value: any, props: any, defaultFormat: string) {
+function getFormatDate (value: any, props: any, defaultFormat: string) {
   return XEUtils.toDateString(value, props.format || defaultFormat)
 }
 
-function getFormatDates(values: any, props: any, separator: string, defaultFormat: string) {
+function getFormatDates (values: any, props: any, separator: string, defaultFormat: string) {
   return XEUtils.map(values, (date: any) => getFormatDate(date, props, defaultFormat)).join(separator)
 }
 
-function equalDaterange(cellValue: any, data: any, props: any, defaultFormat: string) {
+function equalDaterange (cellValue: any, data: any, props: any, defaultFormat: string) {
   cellValue = getFormatDate(cellValue, props, defaultFormat)
   return cellValue >= getFormatDate(data[0], props, defaultFormat) && cellValue <= getFormatDate(data[1], props, defaultFormat)
 }
 
-function matchCascaderData(index: number, list: Array<any>, values: Array<any>, labels: Array<any>) {
+function matchCascaderData (index: number, list: Array<any>, values: Array<any>, labels: Array<any>) {
   let val = values[index]
   if (list && values.length > index) {
     XEUtils.each(list, (item: any) => {
@@ -26,11 +26,11 @@ function matchCascaderData(index: number, list: Array<any>, values: Array<any>, 
   }
 }
 
-function getProps({ $table }: any, { props }: any, defaultProps?: any) {
+function getProps ({ $table }: any, { props }: any, defaultProps?: any) {
   return XEUtils.assign($table.vSize ? { size: $table.vSize } : {}, defaultProps, props)
 }
 
-function getCellEvents(renderOpts: any, params: any) {
+function getCellEvents (renderOpts: any, params: any) {
   let { events } = renderOpts
   let { $table } = params
   let type = 'on-change'
@@ -45,7 +45,7 @@ function getCellEvents(renderOpts: any, params: any) {
   return on
 }
 
-function createEditRender(defaultProps?: any) {
+function createEditRender (defaultProps?: any) {
   return function (h: Function, renderOpts: any, params: any) {
     let { row, column } = params
     let { attrs } = renderOpts
@@ -56,7 +56,7 @@ function createEditRender(defaultProps?: any) {
         attrs,
         model: {
           value: XEUtils.get(row, column.property),
-          callback(value: any) {
+          callback (value: any) {
             XEUtils.set(row, column.property, value)
           }
         },
@@ -66,7 +66,7 @@ function createEditRender(defaultProps?: any) {
   }
 }
 
-function getFilterEvents(on: any, renderOpts: any, params: any, context: any) {
+function getFilterEvents (on: any, renderOpts: any, params: any, context: any) {
   let { events } = renderOpts
   if (events) {
     return XEUtils.assign({}, XEUtils.objectMap(events, (cb: Function) => function (...args: any[]) {
@@ -77,7 +77,7 @@ function getFilterEvents(on: any, renderOpts: any, params: any, context: any) {
   return on
 }
 
-function createFilterRender(defaultProps?: any) {
+function createFilterRender (defaultProps?: any) {
   return function (h: Function, renderOpts: any, params: any, context: any) {
     let { column } = params
     let { name, attrs, events } = renderOpts
@@ -89,12 +89,12 @@ function createFilterRender(defaultProps?: any) {
         attrs,
         model: {
           value: item.data,
-          callback(optionValue: any) {
+          callback (optionValue: any) {
             item.data = optionValue
           }
         },
         on: getFilterEvents({
-          [type](evnt: any) {
+          [type] (evnt: any) {
             handleConfirmFilter(context, column, !!item.data, item)
             if (events && events[type]) {
               events[type](Object.assign({ context }, params), evnt)
@@ -106,18 +106,18 @@ function createFilterRender(defaultProps?: any) {
   }
 }
 
-function handleConfirmFilter(context: any, column: any, checked: any, item: any) {
+function handleConfirmFilter (context: any, column: any, checked: any, item: any) {
   context[column.filterMultiple ? 'changeMultipleOption' : 'changeRadioOption']({}, checked, item)
 }
 
-function defaultFilterMethod({ option, row, column }: any) {
+function defaultFilterMethod ({ option, row, column }: any) {
   let { data } = option
   let cellValue = XEUtils.get(row, column.property)
   /* eslint-disable eqeqeq */
   return cellValue === data
 }
 
-function renderOptions(h: Function, options: any, optionProps: any) {
+function renderOptions (h: Function, options: any, optionProps: any) {
   let labelProp = optionProps.label || 'label'
   let valueProp = optionProps.value || 'value'
   let disabledProp = optionProps.disabled || 'disabled'
@@ -133,37 +133,77 @@ function renderOptions(h: Function, options: any, optionProps: any) {
   })
 }
 
-function cellText(h: Function, cellValue: any) {
+function cellText (h: Function, cellValue: any) {
   return ['' + (cellValue === null || cellValue === void 0 ? '' : cellValue)]
+}
+
+function createFormItemRender (defaultProps?: any) {
+  return function (h: Function, renderOpts: any, params: any, context: any) {
+    let { data, field } = params
+    let { name } = renderOpts
+    let { attrs }: any = renderOpts
+    let props: any = getFormProps(context, renderOpts, defaultProps)
+    return [
+      h(name, {
+        attrs,
+        props,
+        model: {
+          value: XEUtils.get(data, field),
+          callback (value: any) {
+            XEUtils.set(data, field, value)
+          }
+        },
+        on: getFormEvents(renderOpts, params, context)
+      })
+    ]
+  }
+}
+
+function getFormProps ({ $form }: any, { props }: any, defaultProps?: any) {
+  return XEUtils.assign($form.vSize ? { size: $form.vSize } : {}, defaultProps, props)
+}
+
+function getFormEvents (renderOpts: any, params: any, context: any) {
+  let { events }: any = renderOpts
+  let on
+  if (events) {
+    on = XEUtils.assign({}, XEUtils.objectMap(events, (cb: Function) => function (...args: any[]) {
+      cb.apply(null, [params].concat.apply(params, args))
+    }), on)
+  }
+  return on
 }
 
 /**
  * 渲染函数
  */
-const renderMap = {
+const renderMap: any = {
   Input: {
     autofocus: 'input.ivu-input',
     renderDefault: createEditRender(),
     renderEdit: createEditRender(),
     renderFilter: createFilterRender(),
-    filterMethod: defaultFilterMethod
+    filterMethod: defaultFilterMethod,
+    renderItem: createFormItemRender()
   },
   AutoComplete: {
     autofocus: 'input.ivu-input',
     renderDefault: createEditRender(),
     renderEdit: createEditRender(),
     renderFilter: createFilterRender(),
-    filterMethod: defaultFilterMethod
+    filterMethod: defaultFilterMethod,
+    renderItem: createFormItemRender()
   },
   InputNumber: {
     autofocus: 'input.ivu-input-number-input',
     renderDefault: createEditRender(),
     renderEdit: createEditRender(),
     renderFilter: createFilterRender(),
-    filterMethod: defaultFilterMethod
+    filterMethod: defaultFilterMethod,
+    renderItem: createFormItemRender()
   },
   Select: {
-    renderEdit(h: Function, renderOpts: any, params: any) {
+    renderEdit (h: Function, renderOpts: any, params: any) {
       let { options, optionGroups, optionProps = {}, optionGroupProps = {} } = renderOpts
       let { row, column } = params
       let { attrs } = renderOpts
@@ -177,7 +217,7 @@ const renderMap = {
             attrs,
             model: {
               value: XEUtils.get(row, column.property),
-              callback(cellValue: any) {
+              callback (cellValue: any) {
                 XEUtils.set(row, column.property, cellValue)
               }
             },
@@ -198,7 +238,7 @@ const renderMap = {
           attrs,
           model: {
             value: XEUtils.get(row, column.property),
-            callback(cellValue: any) {
+            callback (cellValue: any) {
               XEUtils.set(row, column.property, cellValue)
             }
           },
@@ -206,7 +246,7 @@ const renderMap = {
         }, renderOptions(h, options, optionProps))
       ]
     },
-    renderCell(h: Function, renderOpts: any, params: any) {
+    renderCell (h: Function, renderOpts: any, params: any) {
       let { options, optionGroups, props = {}, optionProps = {}, optionGroupProps = {} } = renderOpts
       let { $table, row, column } = params
       let labelProp = optionProps.label || 'label'
@@ -255,7 +295,7 @@ const renderMap = {
       }
       return cellText(h, '')
     },
-    renderFilter(h: Function, renderOpts: any, params: any, context: any) {
+    renderFilter (h: Function, renderOpts: any, params: any, context: any) {
       let { options, optionGroups, optionProps = {}, optionGroupProps = {} } = renderOpts
       let { column } = params
       let { attrs, events } = renderOpts
@@ -270,12 +310,12 @@ const renderMap = {
             attrs,
             model: {
               value: item.data,
-              callback(optionValue: any) {
+              callback (optionValue: any) {
                 item.data = optionValue
               }
             },
             on: getFilterEvents({
-              [type](value: any) {
+              [type] (value: any) {
                 handleConfirmFilter(context, column, value && value.length > 0, item)
                 if (events && events[type]) {
                   events[type](Object.assign({ context }, params), value)
@@ -298,12 +338,12 @@ const renderMap = {
           attrs,
           model: {
             value: item.data,
-            callback(optionValue: any) {
+            callback (optionValue: any) {
               item.data = optionValue
             }
           },
           on: getFilterEvents({
-            [type](value: any) {
+            [type] (value: any) {
               handleConfirmFilter(context, column, value && value.length > 0, item)
               if (events && events[type]) {
                 events[type](Object.assign({ context }, params), value)
@@ -313,7 +353,7 @@ const renderMap = {
         }, renderOptions(h, options, optionProps))
       })
     },
-    filterMethod({ option, row, column }: any) {
+    filterMethod ({ option, row, column }: any) {
       let { data } = option
       let { property, filterRender: renderOpts } = column
       let { props = {} } = renderOpts
@@ -326,22 +366,66 @@ const renderMap = {
       }
       /* eslint-disable eqeqeq */
       return cellValue == data
+    },
+    renderItem (h: Function, renderOpts: any, params: any, context: any) {
+      let { options, optionGroups, optionProps = {}, optionGroupProps = {} } = renderOpts
+      let { data, property } = params
+      let { attrs } = renderOpts
+      let props: any = getFormProps(context, renderOpts)
+      if (optionGroups) {
+        let groupOptions: string = optionGroupProps.options || 'options'
+        let groupLabel: string = optionGroupProps.label || 'label'
+        return [
+          h('Select', {
+            props,
+            attrs,
+            model: {
+              value: XEUtils.get(data, property),
+              callback (cellValue: any) {
+                XEUtils.set(data, property, cellValue)
+              }
+            },
+            on: getFormEvents(renderOpts, params, context)
+          }, XEUtils.map(optionGroups, (group: any, gIndex: number) => {
+            return h('OptionGroup', {
+              props: {
+                label: group[groupLabel]
+              },
+              key: gIndex
+            }, renderOptions(h, group[groupOptions], optionProps))
+          }))
+        ]
+      }
+      return [
+        h('Select', {
+          props,
+          attrs,
+          model: {
+            value: XEUtils.get(data, property),
+            callback (cellValue: any) {
+              XEUtils.set(data, property, cellValue)
+            }
+          },
+          on: getFormEvents(renderOpts, params, context)
+        }, renderOptions(h, options, optionProps))
+      ]
     }
   },
   Cascader: {
     renderEdit: createEditRender({ transfer: true }),
-    renderCell(h: Function, { props = {} }: any, params: any) {
+    renderCell (h: Function, { props = {} }: any, params: any) {
       let { row, column } = params
       let cellValue = XEUtils.get(row, column.property)
       let values = cellValue || []
       let labels: Array<any> = []
       matchCascaderData(0, props.data, values, labels)
       return cellText(h, labels.join(` ${props.separator || '/'} `))
-    }
+    },
+    renderItem: createFormItemRender()
   },
   DatePicker: {
     renderEdit: createEditRender({ transfer: true }),
-    renderCell(h: Function, { props = {} }: any, params: any) {
+    renderCell (h: Function, { props = {} }: any, params: any) {
       let { row, column } = params
       let { separator } = props
       let cellValue = XEUtils.get(row, column.property)
@@ -370,7 +454,7 @@ const renderMap = {
       }
       return cellText(h, cellValue)
     },
-    renderFilter(h: Function, renderOpts: any, params: any, context: any) {
+    renderFilter (h: Function, renderOpts: any, params: any, context: any) {
       let { column } = params
       let { attrs, events } = renderOpts
       let props = getProps(params, renderOpts, { transfer: true })
@@ -381,12 +465,12 @@ const renderMap = {
           attrs,
           model: {
             value: item.data,
-            callback(optionValue: any) {
+            callback (optionValue: any) {
               item.data = optionValue
             }
           },
           on: getFilterEvents({
-            [type](value: any) {
+            [type] (value: any) {
               handleConfirmFilter(context, column, !!value, item)
               if (events && events[type]) {
                 events[type](Object.assign({ context }, params), value)
@@ -396,7 +480,7 @@ const renderMap = {
         })
       })
     },
-    filterMethod({ option, row, column }: any) {
+    filterMethod ({ option, row, column }: any) {
       let { data } = option
       let { filterRender: renderOpts } = column
       let { props = {} } = renderOpts
@@ -412,29 +496,33 @@ const renderMap = {
         }
       }
       return false
-    }
+    },
+    renderItem: createFormItemRender()
   },
   TimePicker: {
-    renderEdit: createEditRender({ transfer: true })
+    renderEdit: createEditRender({ transfer: true }),
+    renderItem: createFormItemRender()
   },
   Rate: {
     renderDefault: createEditRender(),
     renderEdit: createEditRender(),
     renderFilter: createFilterRender(),
-    filterMethod: defaultFilterMethod
+    filterMethod: defaultFilterMethod,
+    renderItem: createFormItemRender()
   },
   iSwitch: {
     renderDefault: createEditRender(),
     renderEdit: createEditRender(),
     renderFilter: createFilterRender(),
-    filterMethod: defaultFilterMethod
+    filterMethod: defaultFilterMethod,
+    renderItem: createFormItemRender()
   }
 }
 
 /**
  * 事件兼容性处理
  */
-function handleClearEvent(params: any, evnt: any, context: any) {
+function handleClearEvent (params: any, evnt: any, context: any) {
   let { getEventTargetNode } = context
   let bodyElem = document.body
   if (
@@ -449,7 +537,7 @@ function handleClearEvent(params: any, evnt: any, context: any) {
  * 基于 vxe-table 表格的适配插件，用于兼容 iview 组件库
  */
 export const VXETablePluginIView = {
-  install(xtable: typeof VXETable) {
+  install (xtable: typeof VXETable) {
     let { interceptor, renderer } = xtable
     renderer.mixin(renderMap)
     interceptor.add('event.clearFilter', handleClearEvent)

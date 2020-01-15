@@ -193,6 +193,54 @@
   function cellText(h, cellValue) {
     return ['' + (cellValue === null || cellValue === void 0 ? '' : cellValue)];
   }
+
+  function createFormItemRender(defaultProps) {
+    return function (h, renderOpts, params, context) {
+      var data = params.data,
+          field = params.field;
+      var name = renderOpts.name;
+      var attrs = renderOpts.attrs;
+      var props = getFormProps(context, renderOpts, defaultProps);
+      return [h(name, {
+        attrs: attrs,
+        props: props,
+        model: {
+          value: _xeUtils["default"].get(data, field),
+          callback: function callback(value) {
+            _xeUtils["default"].set(data, field, value);
+          }
+        },
+        on: getFormEvents(renderOpts, params, context)
+      })];
+    };
+  }
+
+  function getFormProps(_ref4, _ref5, defaultProps) {
+    var $form = _ref4.$form;
+    var props = _ref5.props;
+    return _xeUtils["default"].assign($form.vSize ? {
+      size: $form.vSize
+    } : {}, defaultProps, props);
+  }
+
+  function getFormEvents(renderOpts, params, context) {
+    var events = renderOpts.events;
+    var on;
+
+    if (events) {
+      on = _xeUtils["default"].assign({}, _xeUtils["default"].objectMap(events, function (cb) {
+        return function () {
+          for (var _len3 = arguments.length, args = new Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
+            args[_key3] = arguments[_key3];
+          }
+
+          cb.apply(null, [params].concat.apply(params, args));
+        };
+      }), on);
+    }
+
+    return on;
+  }
   /**
    * 渲染函数
    */
@@ -204,21 +252,24 @@
       renderDefault: createEditRender(),
       renderEdit: createEditRender(),
       renderFilter: createFilterRender(),
-      filterMethod: defaultFilterMethod
+      filterMethod: defaultFilterMethod,
+      renderItem: createFormItemRender()
     },
     AutoComplete: {
       autofocus: 'input.ivu-input',
       renderDefault: createEditRender(),
       renderEdit: createEditRender(),
       renderFilter: createFilterRender(),
-      filterMethod: defaultFilterMethod
+      filterMethod: defaultFilterMethod,
+      renderItem: createFormItemRender()
     },
     InputNumber: {
       autofocus: 'input.ivu-input-number-input',
       renderDefault: createEditRender(),
       renderEdit: createEditRender(),
       renderFilter: createFilterRender(),
-      filterMethod: defaultFilterMethod
+      filterMethod: defaultFilterMethod,
+      renderItem: createFormItemRender()
     },
     Select: {
       renderEdit: function renderEdit(h, renderOpts, params) {
@@ -424,10 +475,10 @@
           }, renderOptions(h, options, optionProps));
         });
       },
-      filterMethod: function filterMethod(_ref4) {
-        var option = _ref4.option,
-            row = _ref4.row,
-            column = _ref4.column;
+      filterMethod: function filterMethod(_ref6) {
+        var option = _ref6.option,
+            row = _ref6.row,
+            column = _ref6.column;
         var data = option.data;
         var property = column.property,
             renderOpts = column.filterRender;
@@ -447,15 +498,62 @@
 
 
         return cellValue == data;
+      },
+      renderItem: function renderItem(h, renderOpts, params, context) {
+        var options = renderOpts.options,
+            optionGroups = renderOpts.optionGroups,
+            _renderOpts$optionPro4 = renderOpts.optionProps,
+            optionProps = _renderOpts$optionPro4 === void 0 ? {} : _renderOpts$optionPro4,
+            _renderOpts$optionGro4 = renderOpts.optionGroupProps,
+            optionGroupProps = _renderOpts$optionGro4 === void 0 ? {} : _renderOpts$optionGro4;
+        var data = params.data,
+            property = params.property;
+        var attrs = renderOpts.attrs;
+        var props = getFormProps(context, renderOpts);
+
+        if (optionGroups) {
+          var groupOptions = optionGroupProps.options || 'options';
+          var groupLabel = optionGroupProps.label || 'label';
+          return [h('Select', {
+            props: props,
+            attrs: attrs,
+            model: {
+              value: _xeUtils["default"].get(data, property),
+              callback: function callback(cellValue) {
+                _xeUtils["default"].set(data, property, cellValue);
+              }
+            },
+            on: getFormEvents(renderOpts, params, context)
+          }, _xeUtils["default"].map(optionGroups, function (group, gIndex) {
+            return h('OptionGroup', {
+              props: {
+                label: group[groupLabel]
+              },
+              key: gIndex
+            }, renderOptions(h, group[groupOptions], optionProps));
+          }))];
+        }
+
+        return [h('Select', {
+          props: props,
+          attrs: attrs,
+          model: {
+            value: _xeUtils["default"].get(data, property),
+            callback: function callback(cellValue) {
+              _xeUtils["default"].set(data, property, cellValue);
+            }
+          },
+          on: getFormEvents(renderOpts, params, context)
+        }, renderOptions(h, options, optionProps))];
       }
     },
     Cascader: {
       renderEdit: createEditRender({
         transfer: true
       }),
-      renderCell: function renderCell(h, _ref5, params) {
-        var _ref5$props = _ref5.props,
-            props = _ref5$props === void 0 ? {} : _ref5$props;
+      renderCell: function renderCell(h, _ref7, params) {
+        var _ref7$props = _ref7.props,
+            props = _ref7$props === void 0 ? {} : _ref7$props;
         var row = params.row,
             column = params.column;
 
@@ -465,15 +563,16 @@
         var labels = [];
         matchCascaderData(0, props.data, values, labels);
         return cellText(h, labels.join(" ".concat(props.separator || '/', " ")));
-      }
+      },
+      renderItem: createFormItemRender()
     },
     DatePicker: {
       renderEdit: createEditRender({
         transfer: true
       }),
-      renderCell: function renderCell(h, _ref6, params) {
-        var _ref6$props = _ref6.props,
-            props = _ref6$props === void 0 ? {} : _ref6$props;
+      renderCell: function renderCell(h, _ref8, params) {
+        var _ref8$props = _ref8.props,
+            props = _ref8$props === void 0 ? {} : _ref8$props;
         var row = params.row,
             column = params.column;
         var separator = props.separator;
@@ -542,10 +641,10 @@
           });
         });
       },
-      filterMethod: function filterMethod(_ref7) {
-        var option = _ref7.option,
-            row = _ref7.row,
-            column = _ref7.column;
+      filterMethod: function filterMethod(_ref9) {
+        var option = _ref9.option,
+            row = _ref9.row,
+            column = _ref9.column;
         var data = option.data;
         var renderOpts = column.filterRender;
         var _renderOpts$props3 = renderOpts.props,
@@ -567,24 +666,28 @@
         }
 
         return false;
-      }
+      },
+      renderItem: createFormItemRender()
     },
     TimePicker: {
       renderEdit: createEditRender({
         transfer: true
-      })
+      }),
+      renderItem: createFormItemRender()
     },
     Rate: {
       renderDefault: createEditRender(),
       renderEdit: createEditRender(),
       renderFilter: createFilterRender(),
-      filterMethod: defaultFilterMethod
+      filterMethod: defaultFilterMethod,
+      renderItem: createFormItemRender()
     },
     iSwitch: {
       renderDefault: createEditRender(),
       renderEdit: createEditRender(),
       renderFilter: createFilterRender(),
-      filterMethod: defaultFilterMethod
+      filterMethod: defaultFilterMethod,
+      renderItem: createFormItemRender()
     }
   };
   /**
