@@ -23,6 +23,10 @@
 
   function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
+  function isEmptyValue(cellValue) {
+    return cellValue === null || cellValue === undefined || cellValue === '';
+  }
+
   function getFormatDate(value, props, defaultFormat) {
     return _xeUtils["default"].toDateString(value, props.format || defaultFormat);
   }
@@ -64,8 +68,12 @@
     var $table = params.$table;
     var type = 'on-change';
 
-    var on = _defineProperty({}, type, function () {
-      return $table.updateStatus(params);
+    var on = _defineProperty({}, type, function (evnt) {
+      $table.updateStatus(params);
+
+      if (events && events[type]) {
+        events[type](params, evnt);
+      }
     });
 
     if (events) {
@@ -81,6 +89,147 @@
     }
 
     return on;
+  }
+
+  function getSelectCellValue(renderOpts, params) {
+    var options = renderOpts.options,
+        optionGroups = renderOpts.optionGroups,
+        _renderOpts$props = renderOpts.props,
+        props = _renderOpts$props === void 0 ? {} : _renderOpts$props,
+        _renderOpts$optionPro = renderOpts.optionProps,
+        optionProps = _renderOpts$optionPro === void 0 ? {} : _renderOpts$optionPro,
+        _renderOpts$optionGro = renderOpts.optionGroupProps,
+        optionGroupProps = _renderOpts$optionGro === void 0 ? {} : _renderOpts$optionGro;
+    var $table = params.$table,
+        row = params.row,
+        column = params.column;
+    var labelProp = optionProps.label || 'label';
+    var valueProp = optionProps.value || 'value';
+    var groupOptions = optionGroupProps.options || 'options';
+
+    var cellValue = _xeUtils["default"].get(row, column.property);
+
+    var colid = column.id;
+    var rest;
+    var cellData;
+
+    if (props.filterable) {
+      var fullAllDataRowMap = $table.fullAllDataRowMap;
+      var cacheCell = fullAllDataRowMap.has(row);
+
+      if (cacheCell) {
+        rest = fullAllDataRowMap.get(row);
+        cellData = rest.cellData;
+
+        if (!cellData) {
+          cellData = fullAllDataRowMap.get(row).cellData = {};
+        }
+      }
+
+      if (rest && cellData[colid] && cellData[colid].value === cellValue) {
+        return cellData[colid].label;
+      }
+    }
+
+    if (!isEmptyValue(cellValue)) {
+      return _xeUtils["default"].map(props.multiple ? cellValue : [cellValue], optionGroups ? function (value) {
+        var selectItem;
+
+        for (var index = 0; index < optionGroups.length; index++) {
+          selectItem = _xeUtils["default"].find(optionGroups[index][groupOptions], function (item) {
+            return item[valueProp] === value;
+          });
+
+          if (selectItem) {
+            break;
+          }
+        }
+
+        var cellLabel = selectItem ? selectItem[labelProp] : value;
+
+        if (cellData && options && options.length) {
+          cellData[colid] = {
+            value: cellValue,
+            label: cellLabel
+          };
+        }
+
+        return cellLabel;
+      } : function (value) {
+        var selectItem = _xeUtils["default"].find(options, function (item) {
+          return item[valueProp] === value;
+        });
+
+        var cellLabel = selectItem ? selectItem[labelProp] : value;
+
+        if (cellData && options && options.length) {
+          cellData[colid] = {
+            value: cellValue,
+            label: cellLabel
+          };
+        }
+
+        return cellLabel;
+      }).join(';');
+    }
+
+    return null;
+  }
+
+  function getCascaderCellValue(renderOpts, params) {
+    var _renderOpts$props2 = renderOpts.props,
+        props = _renderOpts$props2 === void 0 ? {} : _renderOpts$props2;
+    var row = params.row,
+        column = params.column;
+
+    var cellValue = _xeUtils["default"].get(row, column.property);
+
+    var values = cellValue || [];
+    var labels = [];
+    matchCascaderData(0, props.data, values, labels);
+    return labels.join(" ".concat(props.separator || '/', " "));
+  }
+
+  function getDatePickerCellValue(renderOpts, params) {
+    var _renderOpts$props3 = renderOpts.props,
+        props = _renderOpts$props3 === void 0 ? {} : _renderOpts$props3;
+    var row = params.row,
+        column = params.column;
+    var separator = props.separator;
+
+    var cellValue = _xeUtils["default"].get(row, column.property);
+
+    switch (props.type) {
+      case 'week':
+        cellValue = getFormatDate(cellValue, props, 'yyyywWW');
+        break;
+
+      case 'month':
+        cellValue = getFormatDate(cellValue, props, 'yyyy-MM');
+        break;
+
+      case 'year':
+        cellValue = getFormatDate(cellValue, props, 'yyyy');
+        break;
+
+      case 'dates':
+        cellValue = getFormatDates(cellValue, props, ', ', 'yyyy-MM-dd');
+        break;
+
+      case 'daterange':
+        cellValue = getFormatDates(cellValue, props, " ".concat(separator || '-', " "), 'yyyy-MM-dd');
+        break;
+
+      case 'datetimerange':
+        cellValue = getFormatDates(cellValue, props, " ".concat(separator || '-', " "), 'yyyy-MM-dd HH:ss:mm');
+        break;
+
+      default:
+        cellValue = getFormatDate(cellValue, props, 'yyyy-MM-dd');
+        break;
+    }
+
+    return cellValue;
   }
 
   function createEditRender(defaultProps) {
@@ -191,7 +340,7 @@
   }
 
   function cellText(h, cellValue) {
-    return ['' + (cellValue === null || cellValue === void 0 ? '' : cellValue)];
+    return ['' + (isEmptyValue(cellValue) ? '' : cellValue)];
   }
 
   function createFormItemRender(defaultProps) {
@@ -225,10 +374,19 @@
 
   function getFormEvents(renderOpts, params, context) {
     var events = renderOpts.events;
-    var on;
+    var $form = params.$form;
+    var type = 'on-change';
+
+    var on = _defineProperty({}, type, function (evnt) {
+      $form.updateStatus(params);
+
+      if (events && events[type]) {
+        events[type](params, evnt);
+      }
+    });
 
     if (events) {
-      on = _xeUtils["default"].assign({}, _xeUtils["default"].objectMap(events, function (cb) {
+      return _xeUtils["default"].assign({}, _xeUtils["default"].objectMap(events, function (cb) {
         return function () {
           for (var _len3 = arguments.length, args = new Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
             args[_key3] = arguments[_key3];
@@ -240,6 +398,13 @@
     }
 
     return on;
+  }
+
+  function createExportMethod(valueMethod, isEdit) {
+    var renderProperty = isEdit ? 'editRender' : 'cellRender';
+    return function (params) {
+      return valueMethod(params.column[renderProperty], params);
+    };
   }
   /**
    * 渲染函数
@@ -275,10 +440,10 @@
       renderEdit: function renderEdit(h, renderOpts, params) {
         var options = renderOpts.options,
             optionGroups = renderOpts.optionGroups,
-            _renderOpts$optionPro = renderOpts.optionProps,
-            optionProps = _renderOpts$optionPro === void 0 ? {} : _renderOpts$optionPro,
-            _renderOpts$optionGro = renderOpts.optionGroupProps,
-            optionGroupProps = _renderOpts$optionGro === void 0 ? {} : _renderOpts$optionGro;
+            _renderOpts$optionPro2 = renderOpts.optionProps,
+            optionProps = _renderOpts$optionPro2 === void 0 ? {} : _renderOpts$optionPro2,
+            _renderOpts$optionGro2 = renderOpts.optionGroupProps,
+            optionGroupProps = _renderOpts$optionGro2 === void 0 ? {} : _renderOpts$optionGro2;
         var row = params.row,
             column = params.column;
         var attrs = renderOpts.attrs;
@@ -322,88 +487,7 @@
         }, renderOptions(h, options, optionProps))];
       },
       renderCell: function renderCell(h, renderOpts, params) {
-        var options = renderOpts.options,
-            optionGroups = renderOpts.optionGroups,
-            _renderOpts$props = renderOpts.props,
-            props = _renderOpts$props === void 0 ? {} : _renderOpts$props,
-            _renderOpts$optionPro2 = renderOpts.optionProps,
-            optionProps = _renderOpts$optionPro2 === void 0 ? {} : _renderOpts$optionPro2,
-            _renderOpts$optionGro2 = renderOpts.optionGroupProps,
-            optionGroupProps = _renderOpts$optionGro2 === void 0 ? {} : _renderOpts$optionGro2;
-        var $table = params.$table,
-            row = params.row,
-            column = params.column;
-        var labelProp = optionProps.label || 'label';
-        var valueProp = optionProps.value || 'value';
-        var groupOptions = optionGroupProps.options || 'options';
-
-        var cellValue = _xeUtils["default"].get(row, column.property);
-
-        var colid = column.id;
-        var rest;
-        var cellData;
-
-        if (props.filterable) {
-          var fullAllDataRowMap = $table.fullAllDataRowMap;
-          var cacheCell = fullAllDataRowMap.has(row);
-
-          if (cacheCell) {
-            rest = fullAllDataRowMap.get(row);
-            cellData = rest.cellData;
-
-            if (!cellData) {
-              cellData = fullAllDataRowMap.get(row).cellData = {};
-            }
-          }
-
-          if (rest && cellData[colid] && cellData[colid].value === cellValue) {
-            return cellData[colid].label;
-          }
-        }
-
-        if (!(cellValue === null || cellValue === undefined || cellValue === '')) {
-          return cellText(h, _xeUtils["default"].map(props.multiple ? cellValue : [cellValue], optionGroups ? function (value) {
-            var selectItem;
-
-            for (var index = 0; index < optionGroups.length; index++) {
-              selectItem = _xeUtils["default"].find(optionGroups[index][groupOptions], function (item) {
-                return item[valueProp] === value;
-              });
-
-              if (selectItem) {
-                break;
-              }
-            }
-
-            var cellLabel = selectItem ? selectItem[labelProp] : value;
-
-            if (cellData && options && options.length) {
-              cellData[colid] = {
-                value: cellValue,
-                label: cellLabel
-              };
-            }
-
-            return cellLabel;
-          } : function (value) {
-            var selectItem = _xeUtils["default"].find(options, function (item) {
-              return item[valueProp] === value;
-            });
-
-            var cellLabel = selectItem ? selectItem[labelProp] : value;
-
-            if (cellData && options && options.length) {
-              cellData[colid] = {
-                value: cellValue,
-                label: cellLabel
-              };
-            }
-
-            return cellLabel;
-          }).join(';'));
-        }
-
-        return cellText(h, '');
+        cellText(h, getSelectCellValue(renderOpts, params));
       },
       renderFilter: function renderFilter(h, renderOpts, params, context) {
         var options = renderOpts.options,
@@ -482,8 +566,8 @@
         var data = option.data;
         var property = column.property,
             renderOpts = column.filterRender;
-        var _renderOpts$props2 = renderOpts.props,
-            props = _renderOpts$props2 === void 0 ? {} : _renderOpts$props2;
+        var _renderOpts$props4 = renderOpts.props,
+            props = _renderOpts$props4 === void 0 ? {} : _renderOpts$props4;
 
         var cellValue = _xeUtils["default"].get(row, property);
 
@@ -545,71 +629,27 @@
           },
           on: getFormEvents(renderOpts, params, context)
         }, renderOptions(h, options, optionProps))];
-      }
+      },
+      editExportMethod: createExportMethod(getSelectCellValue, true),
+      cellExportMethod: createExportMethod(getSelectCellValue)
     },
     Cascader: {
       renderEdit: createEditRender({
         transfer: true
       }),
-      renderCell: function renderCell(h, _ref7, params) {
-        var _ref7$props = _ref7.props,
-            props = _ref7$props === void 0 ? {} : _ref7$props;
-        var row = params.row,
-            column = params.column;
-
-        var cellValue = _xeUtils["default"].get(row, column.property);
-
-        var values = cellValue || [];
-        var labels = [];
-        matchCascaderData(0, props.data, values, labels);
-        return cellText(h, labels.join(" ".concat(props.separator || '/', " ")));
+      renderCell: function renderCell(h, renderOpts, params) {
+        return cellText(h, getCascaderCellValue(renderOpts, params));
       },
-      renderItem: createFormItemRender()
+      renderItem: createFormItemRender(),
+      editExportMethod: createExportMethod(getCascaderCellValue, true),
+      cellExportMethod: createExportMethod(getCascaderCellValue)
     },
     DatePicker: {
       renderEdit: createEditRender({
         transfer: true
       }),
-      renderCell: function renderCell(h, _ref8, params) {
-        var _ref8$props = _ref8.props,
-            props = _ref8$props === void 0 ? {} : _ref8$props;
-        var row = params.row,
-            column = params.column;
-        var separator = props.separator;
-
-        var cellValue = _xeUtils["default"].get(row, column.property);
-
-        switch (props.type) {
-          case 'week':
-            cellValue = getFormatDate(cellValue, props, 'yyyywWW');
-            break;
-
-          case 'month':
-            cellValue = getFormatDate(cellValue, props, 'yyyy-MM');
-            break;
-
-          case 'year':
-            cellValue = getFormatDate(cellValue, props, 'yyyy');
-            break;
-
-          case 'dates':
-            cellValue = getFormatDates(cellValue, props, ', ', 'yyyy-MM-dd');
-            break;
-
-          case 'daterange':
-            cellValue = getFormatDates(cellValue, props, " ".concat(separator || '-', " "), 'yyyy-MM-dd');
-            break;
-
-          case 'datetimerange':
-            cellValue = getFormatDates(cellValue, props, " ".concat(separator || '-', " "), 'yyyy-MM-dd HH:ss:mm');
-            break;
-
-          default:
-            cellValue = getFormatDate(cellValue, props, 'yyyy-MM-dd');
-            break;
-        }
-
-        return cellText(h, cellValue);
+      renderCell: function renderCell(h, renderOpts, params) {
+        return cellText(h, getDatePickerCellValue(renderOpts, params));
       },
       renderFilter: function renderFilter(h, renderOpts, params, context) {
         var column = params.column;
@@ -641,14 +681,14 @@
           });
         });
       },
-      filterMethod: function filterMethod(_ref9) {
-        var option = _ref9.option,
-            row = _ref9.row,
-            column = _ref9.column;
+      filterMethod: function filterMethod(_ref7) {
+        var option = _ref7.option,
+            row = _ref7.row,
+            column = _ref7.column;
         var data = option.data;
         var renderOpts = column.filterRender;
-        var _renderOpts$props3 = renderOpts.props,
-            props = _renderOpts$props3 === void 0 ? {} : _renderOpts$props3;
+        var _renderOpts$props5 = renderOpts.props,
+            props = _renderOpts$props5 === void 0 ? {} : _renderOpts$props5;
 
         var cellValue = _xeUtils["default"].get(row, column.property);
 
@@ -667,7 +707,9 @@
 
         return false;
       },
-      renderItem: createFormItemRender()
+      renderItem: createFormItemRender(),
+      editExportMethod: createExportMethod(getDatePickerCellValue, true),
+      cellExportMethod: createExportMethod(getDatePickerCellValue)
     },
     TimePicker: {
       renderEdit: createEditRender({

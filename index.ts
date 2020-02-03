@@ -1,6 +1,10 @@
 import XEUtils from 'xe-utils/methods/xe-utils'
 import VXETable from 'vxe-table/lib/vxe-table'
 
+function isEmptyValue (cellValue: any) {
+  return cellValue === null || cellValue === undefined || cellValue === ''
+}
+
 function getFormatDate (value: any, props: any, defaultFormat: string) {
   return XEUtils.toDateString(value, props.format || defaultFormat)
 }
@@ -35,7 +39,12 @@ function getCellEvents (renderOpts: any, params: any) {
   let { $table } = params
   let type = 'on-change'
   let on = {
-    [type]: () => $table.updateStatus(params)
+    [type]: (evnt: any) => {
+      $table.updateStatus(params)
+      if (events && events[type]) {
+        events[type](params, evnt)
+      }
+    }
   }
   if (events) {
     return XEUtils.assign({}, XEUtils.objectMap(events, (cb: Function) => function (...args: any[]) {
@@ -43,6 +52,97 @@ function getCellEvents (renderOpts: any, params: any) {
     }), on)
   }
   return on
+}
+
+function getSelectCellValue (renderOpts: any, params: any) {
+  let { options, optionGroups, props = {}, optionProps = {}, optionGroupProps = {} } = renderOpts
+  let { $table, row, column } = params
+  let labelProp = optionProps.label || 'label'
+  let valueProp = optionProps.value || 'value'
+  let groupOptions = optionGroupProps.options || 'options'
+  let cellValue = XEUtils.get(row, column.property)
+  let colid: string = column.id
+  let rest: any
+  let cellData: any
+  if (props.filterable) {
+    let fullAllDataRowMap: Map<any, any> = $table.fullAllDataRowMap
+    let cacheCell: any = fullAllDataRowMap.has(row)
+    if (cacheCell) {
+      rest = fullAllDataRowMap.get(row)
+      cellData = rest.cellData
+      if (!cellData) {
+        cellData = fullAllDataRowMap.get(row).cellData = {}
+      }
+    }
+    if (rest && cellData[colid] && cellData[colid].value === cellValue) {
+      return cellData[colid].label
+    }
+  }
+  if (!isEmptyValue(cellValue)) {
+    return XEUtils.map(props.multiple ? cellValue : [cellValue], optionGroups ? (value: any) => {
+      let selectItem
+      for (let index = 0; index < optionGroups.length; index++) {
+        selectItem = XEUtils.find(optionGroups[index][groupOptions], (item: any) => item[valueProp] === value)
+        if (selectItem) {
+          break
+        }
+      }
+      let cellLabel: any = selectItem ? selectItem[labelProp] : value
+      if (cellData && options && options.length) {
+        cellData[colid] = { value: cellValue, label: cellLabel }
+      }
+      return cellLabel
+    } : (value: any) => {
+      let selectItem = XEUtils.find(options, (item: any) => item[valueProp] === value)
+      let cellLabel: any = selectItem ? selectItem[labelProp] : value
+      if (cellData && options && options.length) {
+        cellData[colid] = { value: cellValue, label: cellLabel }
+      }
+      return cellLabel
+    }).join(';')
+  }
+  return null
+}
+
+function getCascaderCellValue (renderOpts: any, params: any) {
+  let { props = {} } = renderOpts
+  let { row, column } = params
+  let cellValue = XEUtils.get(row, column.property)
+  let values = cellValue || []
+  let labels: Array<any> = []
+  matchCascaderData(0, props.data, values, labels)
+  return labels.join(` ${props.separator || '/'} `)
+}
+
+function getDatePickerCellValue (renderOpts: any, params: any) {
+  let { props = {} } = renderOpts
+  let { row, column } = params
+  let { separator } = props
+  let cellValue = XEUtils.get(row, column.property)
+  switch (props.type) {
+    case 'week':
+      cellValue = getFormatDate(cellValue, props, 'yyyywWW')
+      break
+    case 'month':
+      cellValue = getFormatDate(cellValue, props, 'yyyy-MM')
+      break
+    case 'year':
+      cellValue = getFormatDate(cellValue, props, 'yyyy')
+      break
+    case 'dates':
+      cellValue = getFormatDates(cellValue, props, ', ', 'yyyy-MM-dd')
+      break
+    case 'daterange':
+      cellValue = getFormatDates(cellValue, props, ` ${separator || '-'} `, 'yyyy-MM-dd')
+      break
+    case 'datetimerange':
+      cellValue = getFormatDates(cellValue, props, ` ${separator || '-'} `, 'yyyy-MM-dd HH:ss:mm')
+      break
+    default:
+      cellValue = getFormatDate(cellValue, props, 'yyyy-MM-dd')
+      break
+  }
+  return cellValue
 }
 
 function createEditRender (defaultProps?: any) {
@@ -134,7 +234,7 @@ function renderOptions (h: Function, options: any, optionProps: any) {
 }
 
 function cellText (h: Function, cellValue: any) {
-  return ['' + (cellValue === null || cellValue === void 0 ? '' : cellValue)]
+  return ['' + (isEmptyValue(cellValue) ? '' : cellValue)]
 }
 
 function createFormItemRender (defaultProps?: any) {
@@ -165,13 +265,29 @@ function getFormProps ({ $form }: any, { props }: any, defaultProps?: any) {
 
 function getFormEvents (renderOpts: any, params: any, context: any) {
   let { events }: any = renderOpts
-  let on
+  let { $form } = params
+  let type = 'on-change'
+  let on = {
+    [type]: (evnt: any) => {
+      $form.updateStatus(params)
+      if (events && events[type]) {
+        events[type](params, evnt)
+      }
+    }
+  }
   if (events) {
-    on = XEUtils.assign({}, XEUtils.objectMap(events, (cb: Function) => function (...args: any[]) {
+    return XEUtils.assign({}, XEUtils.objectMap(events, (cb: Function) => function (...args: any[]) {
       cb.apply(null, [params].concat.apply(params, args))
     }), on)
   }
   return on
+}
+
+function createExportMethod (valueMethod: Function, isEdit?: boolean) {
+  const renderProperty = isEdit ? 'editRender' : 'cellRender'
+  return function (params: any) {
+    return valueMethod(params.column[renderProperty], params)
+  }
 }
 
 /**
@@ -247,53 +363,7 @@ const renderMap: any = {
       ]
     },
     renderCell (h: Function, renderOpts: any, params: any) {
-      let { options, optionGroups, props = {}, optionProps = {}, optionGroupProps = {} } = renderOpts
-      let { $table, row, column } = params
-      let labelProp = optionProps.label || 'label'
-      let valueProp = optionProps.value || 'value'
-      let groupOptions = optionGroupProps.options || 'options'
-      let cellValue = XEUtils.get(row, column.property)
-      let colid: string = column.id
-      let rest: any
-      let cellData: any
-      if (props.filterable) {
-        let fullAllDataRowMap: Map<any, any> = $table.fullAllDataRowMap
-        let cacheCell: any = fullAllDataRowMap.has(row)
-        if (cacheCell) {
-          rest = fullAllDataRowMap.get(row)
-          cellData = rest.cellData
-          if (!cellData) {
-            cellData = fullAllDataRowMap.get(row).cellData = {}
-          }
-        }
-        if (rest && cellData[colid] && cellData[colid].value === cellValue) {
-          return cellData[colid].label
-        }
-      }
-      if (!(cellValue === null || cellValue === undefined || cellValue === '')) {
-        return cellText(h, XEUtils.map(props.multiple ? cellValue : [cellValue], optionGroups ? (value: any) => {
-          let selectItem
-          for (let index = 0; index < optionGroups.length; index++) {
-            selectItem = XEUtils.find(optionGroups[index][groupOptions], (item: any) => item[valueProp] === value)
-            if (selectItem) {
-              break
-            }
-          }
-          let cellLabel: any = selectItem ? selectItem[labelProp] : value
-          if (cellData && options && options.length) {
-            cellData[colid] = { value: cellValue, label: cellLabel }
-          }
-          return cellLabel
-        } : (value: any) => {
-          let selectItem = XEUtils.find(options, (item: any) => item[valueProp] === value)
-          let cellLabel: any = selectItem ? selectItem[labelProp] : value
-          if (cellData && options && options.length) {
-            cellData[colid] = { value: cellValue, label: cellLabel }
-          }
-          return cellLabel
-        }).join(';'))
-      }
-      return cellText(h, '')
+      cellText(h, getSelectCellValue(renderOpts, params))
     },
     renderFilter (h: Function, renderOpts: any, params: any, context: any) {
       let { options, optionGroups, optionProps = {}, optionGroupProps = {} } = renderOpts
@@ -409,50 +479,23 @@ const renderMap: any = {
           on: getFormEvents(renderOpts, params, context)
         }, renderOptions(h, options, optionProps))
       ]
-    }
+    },
+    editExportMethod: createExportMethod(getSelectCellValue, true),
+    cellExportMethod: createExportMethod(getSelectCellValue)
   },
   Cascader: {
     renderEdit: createEditRender({ transfer: true }),
-    renderCell (h: Function, { props = {} }: any, params: any) {
-      let { row, column } = params
-      let cellValue = XEUtils.get(row, column.property)
-      let values = cellValue || []
-      let labels: Array<any> = []
-      matchCascaderData(0, props.data, values, labels)
-      return cellText(h, labels.join(` ${props.separator || '/'} `))
+    renderCell (h: Function, renderOpts: any, params: any) {
+      return cellText(h, getCascaderCellValue(renderOpts, params))
     },
-    renderItem: createFormItemRender()
+    renderItem: createFormItemRender(),
+    editExportMethod: createExportMethod(getCascaderCellValue, true),
+    cellExportMethod: createExportMethod(getCascaderCellValue)
   },
   DatePicker: {
     renderEdit: createEditRender({ transfer: true }),
-    renderCell (h: Function, { props = {} }: any, params: any) {
-      let { row, column } = params
-      let { separator } = props
-      let cellValue = XEUtils.get(row, column.property)
-      switch (props.type) {
-        case 'week':
-          cellValue = getFormatDate(cellValue, props, 'yyyywWW')
-          break
-        case 'month':
-          cellValue = getFormatDate(cellValue, props, 'yyyy-MM')
-          break
-        case 'year':
-          cellValue = getFormatDate(cellValue, props, 'yyyy')
-          break
-        case 'dates':
-          cellValue = getFormatDates(cellValue, props, ', ', 'yyyy-MM-dd')
-          break
-        case 'daterange':
-          cellValue = getFormatDates(cellValue, props, ` ${separator || '-'} `, 'yyyy-MM-dd')
-          break
-        case 'datetimerange':
-          cellValue = getFormatDates(cellValue, props, ` ${separator || '-'} `, 'yyyy-MM-dd HH:ss:mm')
-          break
-        default:
-          cellValue = getFormatDate(cellValue, props, 'yyyy-MM-dd')
-          break
-      }
-      return cellText(h, cellValue)
+    renderCell (h: Function, renderOpts: any, params: any) {
+      return cellText(h, getDatePickerCellValue(renderOpts, params))
     },
     renderFilter (h: Function, renderOpts: any, params: any, context: any) {
       let { column } = params
@@ -497,7 +540,9 @@ const renderMap: any = {
       }
       return false
     },
-    renderItem: createFormItemRender()
+    renderItem: createFormItemRender(),
+    editExportMethod: createExportMethod(getDatePickerCellValue, true),
+    cellExportMethod: createExportMethod(getDatePickerCellValue)
   },
   TimePicker: {
     renderEdit: createEditRender({ transfer: true }),
