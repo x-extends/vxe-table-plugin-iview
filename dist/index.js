@@ -406,6 +406,40 @@
       return valueMethod(params.column[renderProperty], params);
     };
   }
+
+  function createFormItemRadioAndCheckboxRender() {
+    return function (h, renderOpts, params, context) {
+      var name = renderOpts.name,
+          options = renderOpts.options,
+          _renderOpts$optionPro2 = renderOpts.optionProps,
+          optionProps = _renderOpts$optionPro2 === void 0 ? {} : _renderOpts$optionPro2;
+      var data = params.data,
+          property = params.property;
+      var attrs = renderOpts.attrs;
+      var props = getFormProps(context, renderOpts);
+      var labelProp = optionProps.label || 'label';
+      var valueProp = optionProps.value || 'value';
+      var disabledProp = optionProps.disabled || 'disabled';
+      return [h("".concat(name, "Group"), {
+        props: props,
+        attrs: attrs,
+        model: {
+          value: _xeUtils["default"].get(data, property),
+          callback: function callback(cellValue) {
+            _xeUtils["default"].set(data, property, cellValue);
+          }
+        },
+        on: getFormEvents(renderOpts, params, context)
+      }, options.map(function (option) {
+        return h(name, {
+          props: {
+            label: option[valueProp],
+            disabled: option[disabledProp]
+          }
+        }, option[labelProp]);
+      }))];
+    };
+  }
   /**
    * 渲染函数
    */
@@ -440,8 +474,8 @@
       renderEdit: function renderEdit(h, renderOpts, params) {
         var options = renderOpts.options,
             optionGroups = renderOpts.optionGroups,
-            _renderOpts$optionPro2 = renderOpts.optionProps,
-            optionProps = _renderOpts$optionPro2 === void 0 ? {} : _renderOpts$optionPro2,
+            _renderOpts$optionPro3 = renderOpts.optionProps,
+            optionProps = _renderOpts$optionPro3 === void 0 ? {} : _renderOpts$optionPro3,
             _renderOpts$optionGro2 = renderOpts.optionGroupProps,
             optionGroupProps = _renderOpts$optionGro2 === void 0 ? {} : _renderOpts$optionGro2;
         var row = params.row,
@@ -492,8 +526,8 @@
       renderFilter: function renderFilter(h, renderOpts, params, context) {
         var options = renderOpts.options,
             optionGroups = renderOpts.optionGroups,
-            _renderOpts$optionPro3 = renderOpts.optionProps,
-            optionProps = _renderOpts$optionPro3 === void 0 ? {} : _renderOpts$optionPro3,
+            _renderOpts$optionPro4 = renderOpts.optionProps,
+            optionProps = _renderOpts$optionPro4 === void 0 ? {} : _renderOpts$optionPro4,
             _renderOpts$optionGro3 = renderOpts.optionGroupProps,
             optionGroupProps = _renderOpts$optionGro3 === void 0 ? {} : _renderOpts$optionGro3;
         var column = params.column;
@@ -586,8 +620,8 @@
       renderItem: function renderItem(h, renderOpts, params, context) {
         var options = renderOpts.options,
             optionGroups = renderOpts.optionGroups,
-            _renderOpts$optionPro4 = renderOpts.optionProps,
-            optionProps = _renderOpts$optionPro4 === void 0 ? {} : _renderOpts$optionPro4,
+            _renderOpts$optionPro5 = renderOpts.optionProps,
+            optionProps = _renderOpts$optionPro5 === void 0 ? {} : _renderOpts$optionPro5,
             _renderOpts$optionGro4 = renderOpts.optionGroupProps,
             optionGroupProps = _renderOpts$optionGro4 === void 0 ? {} : _renderOpts$optionGro4;
         var data = params.data,
@@ -730,6 +764,12 @@
       renderFilter: createFilterRender(),
       filterMethod: defaultFilterMethod,
       renderItem: createFormItemRender()
+    },
+    Radio: {
+      renderItem: createFormItemRadioAndCheckboxRender()
+    },
+    Checkbox: {
+      renderItem: createFormItemRadioAndCheckboxRender()
     }
   };
   /**
