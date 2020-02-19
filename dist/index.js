@@ -664,8 +664,8 @@
           on: getFormEvents(renderOpts, params, context)
         }, renderOptions(h, options, optionProps))];
       },
-      editExportMethod: createExportMethod(getSelectCellValue, true),
-      cellExportMethod: createExportMethod(getSelectCellValue)
+      cellExportMethod: createExportMethod(getSelectCellValue),
+      editCellExportMethod: createExportMethod(getSelectCellValue, true)
     },
     Cascader: {
       renderEdit: createEditRender({
@@ -675,8 +675,8 @@
         return cellText(h, getCascaderCellValue(renderOpts, params));
       },
       renderItem: createFormItemRender(),
-      editExportMethod: createExportMethod(getCascaderCellValue, true),
-      cellExportMethod: createExportMethod(getCascaderCellValue)
+      cellExportMethod: createExportMethod(getCascaderCellValue),
+      editCellExportMethod: createExportMethod(getCascaderCellValue, true)
     },
     DatePicker: {
       renderEdit: createEditRender({
@@ -742,8 +742,8 @@
         return false;
       },
       renderItem: createFormItemRender(),
-      editExportMethod: createExportMethod(getDatePickerCellValue, true),
-      cellExportMethod: createExportMethod(getDatePickerCellValue)
+      cellExportMethod: createExportMethod(getDatePickerCellValue),
+      editCellExportMethod: createExportMethod(getDatePickerCellValue, true)
     },
     TimePicker: {
       renderEdit: createEditRender({
