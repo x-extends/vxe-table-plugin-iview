@@ -166,12 +166,11 @@ function createEditRender (defaultProps?: any) {
   }
 }
 
-function getFilterEvents (on: any, renderOpts: any, params: any, context: any) {
+function getFilterEvents (on: any, renderOpts: any, params: any) {
   let { events } = renderOpts
   if (events) {
     return XEUtils.assign({}, XEUtils.objectMap(events, (cb: Function) => function (...args: any[]) {
-      params = Object.assign({ context }, params)
-      cb.apply(null, [params].concat.apply(params, args))
+      cb.apply(null, [params].concat(args))
     }), on)
   }
   return on
@@ -195,19 +194,20 @@ function createFilterRender (defaultProps?: any) {
         },
         on: getFilterEvents({
           [type] (evnt: any) {
-            handleConfirmFilter(context, column, !!item.data, item)
+            handleConfirmFilter(params, column, !!item.data, item)
             if (events && events[type]) {
-              events[type](Object.assign({ context }, params), evnt)
+              events[type](params, evnt)
             }
           }
-        }, renderOpts, params, context)
+        }, renderOpts, params)
       })
     })
   }
 }
 
-function handleConfirmFilter (context: any, column: any, checked: any, item: any) {
-  context[column.filterMultiple ? 'changeMultipleOption' : 'changeRadioOption']({}, checked, item)
+function handleConfirmFilter (params: any, column: any, checked: any, item: any) {
+  const $panel = params.$panel || params.context
+  $panel[column.filterMultiple ? 'changeMultipleOption' : 'changeRadioOption']({}, checked, item)
 }
 
 function defaultFilterMethod ({ option, row, column }: any) {
@@ -242,7 +242,7 @@ function createFormItemRender (defaultProps?: any) {
     let { data, property } = params
     let { name } = renderOpts
     let { attrs }: any = renderOpts
-    let props: any = getFormProps(context, renderOpts, defaultProps)
+    let props: any = getFormProps(params, renderOpts, defaultProps)
     return [
       h(name, {
         attrs,
@@ -253,7 +253,7 @@ function createFormItemRender (defaultProps?: any) {
             XEUtils.set(data, property, value)
           }
         },
-        on: getFormEvents(renderOpts, params, context)
+        on: getFormEvents(renderOpts, params)
       })
     ]
   }
@@ -263,7 +263,7 @@ function getFormProps ({ $form }: any, { props }: any, defaultProps?: any) {
   return XEUtils.assign($form.vSize ? { size: $form.vSize } : {}, defaultProps, props)
 }
 
-function getFormEvents (renderOpts: any, params: any, context: any) {
+function getFormEvents (renderOpts: any, params: any) {
   let { events }: any = renderOpts
   let { $form } = params
   let type = 'on-change'
@@ -295,7 +295,7 @@ function createFormItemRadioAndCheckboxRender () {
     let { name, options, optionProps = {} } = renderOpts
     let { data, property } = params
     let { attrs } = renderOpts
-    let props: any = getFormProps(context, renderOpts)
+    let props: any = getFormProps(params, renderOpts)
     let labelProp: string = optionProps.label || 'label'
     let valueProp: string = optionProps.value || 'value'
     let disabledProp: string = optionProps.disabled || 'disabled'
@@ -309,7 +309,7 @@ function createFormItemRadioAndCheckboxRender () {
             XEUtils.set(data, property, cellValue)
           }
         },
-        on: getFormEvents(renderOpts, params, context)
+        on: getFormEvents(renderOpts, params)
       }, options.map((option: any) => {
         return h(name, {
           props: {
@@ -418,12 +418,12 @@ const renderMap: any = {
             },
             on: getFilterEvents({
               [type] (value: any) {
-                handleConfirmFilter(context, column, value && value.length > 0, item)
+                handleConfirmFilter(params, column, value && value.length > 0, item)
                 if (events && events[type]) {
-                  events[type](Object.assign({ context }, params), value)
+                  events[type](params, value)
                 }
               }
-            }, renderOpts, params, context)
+            }, renderOpts, params)
           }, XEUtils.map(optionGroups, (group: any, gIndex: number) => {
             return h('OptionGroup', {
               props: {
@@ -446,12 +446,12 @@ const renderMap: any = {
           },
           on: getFilterEvents({
             [type] (value: any) {
-              handleConfirmFilter(context, column, value && value.length > 0, item)
+              handleConfirmFilter(params, column, value && value.length > 0, item)
               if (events && events[type]) {
-                events[type](Object.assign({ context }, params), value)
+                events[type](params, value)
               }
             }
-          }, renderOpts, params, context)
+          }, renderOpts, params)
         }, renderOptions(h, options, optionProps))
       })
     },
@@ -473,7 +473,7 @@ const renderMap: any = {
       let { options, optionGroups, optionProps = {}, optionGroupProps = {} } = renderOpts
       let { data, property } = params
       let { attrs } = renderOpts
-      let props: any = getFormProps(context, renderOpts)
+      let props: any = getFormProps(params, renderOpts)
       if (optionGroups) {
         let groupOptions: string = optionGroupProps.options || 'options'
         let groupLabel: string = optionGroupProps.label || 'label'
@@ -487,7 +487,7 @@ const renderMap: any = {
                 XEUtils.set(data, property, cellValue)
               }
             },
-            on: getFormEvents(renderOpts, params, context)
+            on: getFormEvents(renderOpts, params)
           }, XEUtils.map(optionGroups, (group: any, gIndex: number) => {
             return h('OptionGroup', {
               props: {
@@ -508,7 +508,7 @@ const renderMap: any = {
               XEUtils.set(data, property, cellValue)
             }
           },
-          on: getFormEvents(renderOpts, params, context)
+          on: getFormEvents(renderOpts, params)
         }, renderOptions(h, options, optionProps))
       ]
     },
@@ -546,12 +546,12 @@ const renderMap: any = {
           },
           on: getFilterEvents({
             [type] (value: any) {
-              handleConfirmFilter(context, column, !!value, item)
+              handleConfirmFilter(params, column, !!value, item)
               if (events && events[type]) {
-                events[type](Object.assign({ context }, params), value)
+                events[type](params, value)
               }
             }
-          }, renderOpts, params, context)
+          }, renderOpts, params)
         })
       })
     },
@@ -606,8 +606,9 @@ const renderMap: any = {
  * 事件兼容性处理
  */
 function handleClearEvent (params: any, evnt: any, context: any) {
-  let { getEventTargetNode } = context
-  let bodyElem = document.body
+  const { $table } = params
+  const getEventTargetNode = $table ? $table.getEventTargetNode : context.getEventTargetNode
+  const bodyElem: HTMLElement = document.body
   if (
     // 下拉框、日期
     getEventTargetNode(evnt, bodyElem, 'ivu-select-dropdown').flag
