@@ -193,7 +193,7 @@ function getFilterEvents (on: any, renderOpts: any, params: any) {
 }
 
 function createFilterRender (defaultProps?: any) {
-  return function (h: Function, renderOpts: any, params: any, context: any) {
+  return function (h: Function, renderOpts: any, params: any) {
     let { column } = params
     let { name, attrs, events } = renderOpts
     let type = 'on-change'
@@ -254,7 +254,7 @@ function cellText (h: Function, cellValue: any) {
 }
 
 function createFormItemRender (defaultProps?: any) {
-  return function (h: Function, renderOpts: any, params: any, context: any) {
+  return function (h: Function, renderOpts: any, params: any) {
     let { data, property } = params
     let { name } = renderOpts
     let { attrs }: any = renderOpts
@@ -323,7 +323,7 @@ function createExportMethod (valueMethod: Function, isEdit?: boolean) {
 }
 
 function createFormItemRadioAndCheckboxRender () {
-  return function (h: Function, renderOpts: any, params: any, context: any) {
+  return function (h: Function, renderOpts: any, params: any) {
     let { name, options, optionProps = {} } = renderOpts
     let { data, property } = params
     let { attrs } = renderOpts
@@ -429,7 +429,7 @@ const renderMap: any = {
     renderCell (h: Function, renderOpts: any, params: any) {
       cellText(h, getSelectCellValue(renderOpts, params))
     },
-    renderFilter (h: Function, renderOpts: any, params: any, context: any) {
+    renderFilter (h: Function, renderOpts: any, params: any) {
       let { options, optionGroups, optionProps = {}, optionGroupProps = {} } = renderOpts
       let { column } = params
       let { attrs, events } = renderOpts
@@ -501,7 +501,7 @@ const renderMap: any = {
       /* eslint-disable eqeqeq */
       return cellValue == data
     },
-    renderItem (h: Function, renderOpts: any, params: any, context: any) {
+    renderItem (h: Function, renderOpts: any, params: any) {
       let { options, optionGroups, optionProps = {}, optionGroupProps = {} } = renderOpts
       let { data, property } = params
       let { attrs } = renderOpts
@@ -561,7 +561,7 @@ const renderMap: any = {
     renderCell (h: Function, renderOpts: any, params: any) {
       return cellText(h, getDatePickerCellValue(renderOpts, params))
     },
-    renderFilter (h: Function, renderOpts: any, params: any, context: any) {
+    renderFilter (h: Function, renderOpts: any, params: any) {
       let { column } = params
       let { attrs, events } = renderOpts
       let props = getProps(params, renderOpts, { transfer: true })
