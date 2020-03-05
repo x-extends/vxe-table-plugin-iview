@@ -427,7 +427,7 @@ const renderMap: any = {
       ]
     },
     renderCell (h: Function, renderOpts: any, params: any) {
-      cellText(h, getSelectCellValue(renderOpts, params))
+      return cellText(h, getSelectCellValue(renderOpts, params))
     },
     renderFilter (h: Function, renderOpts: any, params: any) {
       let { options, optionGroups, optionProps = {}, optionGroupProps = {} } = renderOpts
