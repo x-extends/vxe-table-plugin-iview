@@ -170,7 +170,7 @@
         }
 
         return cellLabel;
-      }).join(';');
+      }).join(', ');
     }
 
     return null;
