@@ -7,6 +7,7 @@ import {
   OptionProps,
   TableRenderParams,
   RenderOptions,
+  ColumnFilterParams,
   ColumnFilterRenderOptions,
   ColumnCellRenderOptions,
   ColumnEditRenderOptions,
@@ -36,15 +37,15 @@ function getChangeEvent (renderOpts: RenderOptions) {
   return 'on-change'
 }
 
-function getFormatDate (value: any, props: any, defaultFormat: string) {
+function getFormatDate (value: any, props: { [key: string]: any }, defaultFormat: string) {
   return XEUtils.toDateString(value, props.format || defaultFormat)
 }
 
-function getFormatDates (values: any, props: any, separator: string, defaultFormat: string) {
+function getFormatDates (values: any, props: { [key: string]: any }, separator: string, defaultFormat: string) {
   return XEUtils.map(values, (date: any) => getFormatDate(date, props, defaultFormat)).join(separator)
 }
 
-function equalDaterange (cellValue: any, data: any, props: any, defaultFormat: string) {
+function equalDaterange (cellValue: any, data: any, props: { [key: string]: any }, defaultFormat: string) {
   cellValue = getFormatDate(cellValue, props, defaultFormat)
   return cellValue >= getFormatDate(data[0], props, defaultFormat) && cellValue <= getFormatDate(data[1], props, defaultFormat)
 }
@@ -103,7 +104,7 @@ function getEditOns (renderOpts: RenderOptions, params: ColumnEditRenderParams) 
   })
 }
 
-function getFilterOns (renderOpts: RenderOptions, params: ColumnFilterRenderParams, option: any, changeFunc: Function) {
+function getFilterOns (renderOpts: RenderOptions, params: ColumnFilterRenderParams, option: ColumnFilterParams, changeFunc: Function) {
   return getOns(renderOpts, params, (value: any) => {
     // 处理 model 值双向绑定
     option.data = value
@@ -121,10 +122,10 @@ function getItemOns (renderOpts: RenderOptions, params: FormItemRenderParams) {
   })
 }
 
-function matchCascaderData (index: number, list: Array<any>, values: Array<any>, labels: Array<any>) {
+function matchCascaderData (index: number, list: any[], values: any[], labels: any[]) {
   const val = values[index]
   if (list && values.length > index) {
-    XEUtils.each(list, (item: any) => {
+    XEUtils.each(list, (item) => {
       if (item.value === val) {
         labels.push(item.label)
         matchCascaderData(++index, item.children, values, labels)
@@ -133,9 +134,10 @@ function matchCascaderData (index: number, list: Array<any>, values: Array<any>,
   }
 }
 
-function getSelectCellValue (renderOpts: ColumnCellRenderOptions, params: any) {
+function getSelectCellValue (renderOpts: ColumnCellRenderOptions, params: ColumnCellRenderParams) {
   const { options = [], optionGroups, props = {}, optionProps = {}, optionGroupProps = {} } = renderOpts
-  const { $table, row, column } = params
+  const { row, column } = params
+  const $table: any = params.$table
   const labelProp = optionProps.label || 'label'
   const valueProp = optionProps.value || 'value'
   const groupOptions = optionGroupProps.options || 'options'
@@ -158,10 +160,10 @@ function getSelectCellValue (renderOpts: ColumnCellRenderOptions, params: any) {
     }
   }
   if (!isEmptyValue(cellValue)) {
-    return XEUtils.map(props.multiple ? cellValue : [cellValue], optionGroups ? (value: any) => {
+    return XEUtils.map(props.multiple ? cellValue : [cellValue], optionGroups ? (value) => {
       let selectItem
       for (let index = 0; index < optionGroups.length; index++) {
-        selectItem = XEUtils.find(optionGroups[index][groupOptions], (item: any) => item[valueProp] === value)
+        selectItem = XEUtils.find(optionGroups[index][groupOptions], (item) => item[valueProp] === value)
         if (selectItem) {
           break
         }
@@ -171,8 +173,8 @@ function getSelectCellValue (renderOpts: ColumnCellRenderOptions, params: any) {
         cellData[colid] = { value: cellValue, label: cellLabel }
       }
       return cellLabel
-    } : (value: any) => {
-      const selectItem = XEUtils.find(options, (item: any) => item[valueProp] === value)
+    } : (value) => {
+      const selectItem = XEUtils.find(options, (item) => item[valueProp] === value)
       const cellLabel: any = selectItem ? selectItem[labelProp] : value
       if (cellData && options && options.length) {
         cellData[colid] = { value: cellValue, label: cellLabel }
@@ -187,8 +189,8 @@ function getCascaderCellValue (renderOpts: RenderOptions, params: ColumnCellRend
   const { props = {} } = renderOpts
   const { row, column } = params
   const cellValue = XEUtils.get(row, column.property)
-  const values = cellValue || []
-  const labels: Array<any> = []
+  const values: any[] = cellValue || []
+  const labels: any[] = []
   matchCascaderData(0, props.data, values, labels)
   return labels.join(` ${props.separator || '/'} `)
 }
@@ -251,14 +253,14 @@ function defaultButtonEditRender (h: CreateElement, renderOpts: ColumnEditRender
 }
 
 function defaultButtonsEditRender (h: CreateElement, renderOpts: ColumnEditRenderOptions, params: ColumnEditRenderParams) {
-  return renderOpts.children.map((childRenderOpts: any) => defaultButtonEditRender(h, childRenderOpts, params)[0])
+  return renderOpts.children.map((childRenderOpts: ColumnEditRenderOptions) => defaultButtonEditRender(h, childRenderOpts, params)[0])
 }
 
-function createFilterRender (defaultProps?: any) {
+function createFilterRender (defaultProps?: { [key: string]: any }) {
   return function (h: CreateElement, renderOpts: ColumnFilterRenderOptions, params: ColumnFilterRenderParams) {
     const { column } = params
     const { name, attrs } = renderOpts
-    return column.filters.map((option: any, oIndex: number) => {
+    return column.filters.map((option, oIndex) => {
       const optionValue = option.data
       return h(name, {
         key: oIndex,
@@ -273,7 +275,7 @@ function createFilterRender (defaultProps?: any) {
   }
 }
 
-function handleConfirmFilter (params: ColumnFilterRenderParams, checked: boolean, option: any) {
+function handleConfirmFilter (params: ColumnFilterRenderParams, checked: boolean, option: ColumnFilterParams) {
   const { $panel } = params
   $panel.changeOption({}, checked, option)
 }
@@ -335,7 +337,7 @@ function defaultButtonItemRender (h: CreateElement, renderOpts: FormItemRenderOp
 }
 
 function defaultButtonsItemRender (h: CreateElement, renderOpts: FormItemRenderOptions, params: FormItemRenderParams) {
-  return renderOpts.children.map((childRenderOpts: any) => defaultButtonItemRender(h, childRenderOpts, params)[0])
+  return renderOpts.children.map((childRenderOpts: FormItemRenderOptions) => defaultButtonItemRender(h, childRenderOpts, params)[0])
 }
 
 function createExportMethod (valueMethod: Function, isEdit?: boolean) {
@@ -359,7 +361,7 @@ function createFormItemRadioAndCheckboxRender () {
         attrs,
         props: getItemProps(renderOpts, params, itemValue),
         on: getItemOns(renderOpts, params)
-      }, options.map((option: any) => {
+      }, options.map((option) => {
         return h(name, {
           props: {
             label: option[valueProp],
@@ -415,7 +417,7 @@ const renderMap: any = {
             attrs,
             props,
             on
-          }, XEUtils.map(optionGroups, (group: any, gIndex: number) => {
+          }, XEUtils.map(optionGroups, (group, gIndex) => {
             return h('OptionGroup', {
               props: {
                 label: group[groupLabel]
@@ -596,7 +598,7 @@ const renderMap: any = {
     renderFilter (h: CreateElement, renderOpts: ColumnFilterRenderOptions, params: ColumnFilterRenderParams) {
       const { column } = params
       const { name, attrs } = renderOpts
-      return column.filters.map((option: any, oIndex: number) => {
+      return column.filters.map((option, oIndex) => {
         const optionValue = option.data
         return h(name, {
           key: oIndex,
@@ -637,7 +639,7 @@ function getEventTargetNode (evnt: any, container: HTMLElement, className: strin
   let targetElem
   let target = evnt.target
   while (target && target.nodeType && target !== document) {
-    if (className && target.className && target.className.split(' ').indexOf(className) > -1) {
+    if (className && target.className && target.className.split && target.className.split(' ').indexOf(className) > -1) {
       targetElem = target
     } else if (target === container) {
       return { flag: className ? !!targetElem : true, container, targetElem: targetElem }
