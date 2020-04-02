@@ -7,7 +7,7 @@
 [![gzip size: CSS](http://img.badgesize.io/https://unpkg.com/vxe-table-plugin-iview/dist/style.min.css?compression=gzip&label=gzip%20size:%20CSS)](https://unpkg.com/vxe-table-plugin-iview/dist/style.min.css)
 [![npm license](https://img.shields.io/github/license/mashape/apistatus.svg)](https://github.com/xuliangzhan/vxe-table-plugin-iview/blob/master/LICENSE)
 
-基于 [vxe-table](https://github.com/xuliangzhan/vxe-table) 表格的适配插件，用于兼容 [iview](https://www.npmjs.com/package/iview) 组件库
+基于 [vxe-table](https://github.com/xuliangzhan/vxe-table) 表格的适配插件，用于兼容 [iview](https://www.npmjs.com/package/iview)/[view-design](https://www.npmjs.com/package/view-design) 组件库
 
 ## Installing
 
