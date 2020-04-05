@@ -19,6 +19,7 @@ npm install xe-utils vxe-table vxe-table-plugin-iview iview
 import Vue from 'vue'
 import VXETable from 'vxe-table'
 import VXETablePluginIView from 'vxe-table-plugin-iview'
+import 'vxe-table/lib/index.css'
 import 'vxe-table-plugin-iview/dist/style.css'
 
 Vue.use(VXETable)
