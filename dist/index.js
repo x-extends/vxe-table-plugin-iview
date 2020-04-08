@@ -801,8 +801,9 @@
    */
 
 
-  function handleClearEvent(params, evnt) {
+  function handleClearEvent(params, e) {
     var bodyElem = document.body;
+    var evnt = params.$event || e;
 
     if ( // 下拉框、日期
     getEventTargetNode(evnt, bodyElem, 'ivu-select-dropdown').flag) {

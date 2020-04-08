@@ -5,6 +5,7 @@ import {
   VXETable,
   RenderParams,
   OptionProps,
+  InterceptorParams,
   TableRenderParams,
   RenderOptions,
   ColumnFilterParams,
@@ -652,8 +653,9 @@ function getEventTargetNode (evnt: any, container: HTMLElement, className: strin
 /**
  * 事件兼容性处理
  */
-function handleClearEvent (params: TableRenderParams, evnt: any) {
+function handleClearEvent (params: InterceptorParams, e: any) {
   const bodyElem: HTMLElement = document.body
+  const evnt = params.$event || e
   if (
     // 下拉框、日期
     getEventTargetNode(evnt, bodyElem, 'ivu-select-dropdown').flag
