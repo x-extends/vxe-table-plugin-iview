@@ -32,6 +32,9 @@
 .vxe-tree-cell > .ivu-date-picker-editor {
   width: 100%; }
 
+.vxe-table--filter-iview-wrapper {
+  padding: 0.8em 1em; }
+
 .vxe-table--filter-body > .ivu-input-wrapper,
 .vxe-table--filter-body > .ivu-input-number,
 .vxe-table--filter-body > .ivu-select,
