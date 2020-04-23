@@ -455,13 +455,14 @@ const renderMap = {
         }, optionGroups
           ? column.filters.map((option, oIndex) => {
             const optionValue = option.data
+            const props = getCellEditFilterProps(renderOpts, params, optionValue)
             return h('Select', {
               key: oIndex,
               attrs,
-              props: getCellEditFilterProps(renderOpts, params, optionValue),
+              props,
               on: getFilterOns(renderOpts, params, option, () => {
-              // 处理 change 事件相关逻辑
-                handleConfirmFilter(params, option.data && option.data.length > 0, option)
+                // 处理 change 事件相关逻辑
+                handleConfirmFilter(params, props.multiple ? (option.data && option.data.length > 0) : !XEUtils.eqNull(option.data), option)
               })
             }, XEUtils.map(optionGroups, (group, gIndex) => {
               return h('OptionGroup', {
@@ -474,13 +475,14 @@ const renderMap = {
           })
           : column.filters.map((option, oIndex) => {
             const optionValue = option.data
+            const props = getCellEditFilterProps(renderOpts, params, optionValue)
             return h('Select', {
               key: oIndex,
               attrs,
-              props: getCellEditFilterProps(renderOpts, params, optionValue),
+              props,
               on: getFilterOns(renderOpts, params, option, () => {
-              // 处理 change 事件相关逻辑
-                handleConfirmFilter(params, option.data && option.data.length > 0, option)
+                // 处理 change 事件相关逻辑
+                handleConfirmFilter(params, props.multiple ? (option.data && option.data.length > 0) : !XEUtils.eqNull(option.data), option)
               })
             }, renderOptions(h, options, optionProps))
           })
