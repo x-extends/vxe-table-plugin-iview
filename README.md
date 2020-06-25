@@ -82,7 +82,6 @@ VXETable.use(VXETablePluginIView)
 
 ```html
 <vxe-table
-  border
   height="600"
   :data="tableData"
   :edit-config="{trigger: 'click', mode: 'cell'}">
