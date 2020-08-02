@@ -362,10 +362,10 @@ function defaultButtonsItemRender (h: CreateElement, renderOpts: FormItemRenderO
   return renderOpts.children.map((childRenderOpts: FormItemRenderOptions) => defaultButtonItemRender(h, childRenderOpts, params)[0])
 }
 
-function createExportMethod (valueMethod: Function, isEdit?: boolean) {
-  const renderProperty = isEdit ? 'editRender' : 'cellRender'
+function createExportMethod (getExportCellValue: Function) {
   return function (params: ColumnExportCellRenderParams) {
-    return valueMethod(params.column[renderProperty], params)
+    const { column } = params
+    return getExportCellValue(column.editRender || column.cellRender, params)
   }
 }
 
@@ -564,8 +564,7 @@ const renderMap = {
         }, renderOptions(h, options, optionProps))
       ]
     },
-    cellExportMethod: createExportMethod(getSelectCellValue),
-    editCellExportMethod: createExportMethod(getSelectCellValue, true)
+    cellExportMethod: createExportMethod(getSelectCellValue)
   },
   Cascader: {
     renderEdit: createEditRender({ transfer: true }),
@@ -573,8 +572,7 @@ const renderMap = {
       return cellText(h, getCascaderCellValue(renderOpts, params))
     },
     renderItem: createFormItemRender(),
-    cellExportMethod: createExportMethod(getCascaderCellValue),
-    editCellExportMethod: createExportMethod(getCascaderCellValue, true)
+    cellExportMethod: createExportMethod(getCascaderCellValue)
   },
   DatePicker: {
     renderEdit: createEditRender({ transfer: true }),
@@ -622,8 +620,7 @@ const renderMap = {
       return false
     },
     renderItem: createFormItemRender(),
-    cellExportMethod: createExportMethod(getDatePickerCellValue),
-    editCellExportMethod: createExportMethod(getDatePickerCellValue, true)
+    cellExportMethod: createExportMethod(getDatePickerCellValue)
   },
   TimePicker: {
     renderEdit: createEditRender({ transfer: true }),

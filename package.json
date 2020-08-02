@@ -1,6 +1,6 @@
 {
   "name": "vxe-table-plugin-iview",
-  "version": "1.8.8",
+  "version": "1.9.0",
   "description": "基于 vxe-table 表格的适配插件，用于兼容 iview、view-design 组件库",
   "scripts": {
     "lib": "gulp build"
@@ -54,7 +54,7 @@
   },
   "peerDependencies": {
     "view-design": ">= 4.0.0",
-    "vxe-table": ">= 1.15.30"
+    "vxe-table": ">= 1.15.31"
   },
   "repository": {
     "type": "git",
