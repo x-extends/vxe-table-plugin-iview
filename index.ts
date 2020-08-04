@@ -311,14 +311,13 @@ function defaultFilterMethod (params: ColumnFilterMethodParams) {
 function renderOptions (h: CreateElement, options: any[], optionProps: OptionProps) {
   const labelProp = optionProps.label || 'label'
   const valueProp = optionProps.value || 'value'
-  const disabledProp = optionProps.disabled || 'disabled'
   return XEUtils.map(options, (item, oIndex) => {
     return h('Option', {
       key: oIndex,
       props: {
         value: item[valueProp],
         label: item[labelProp],
-        disabled: item[disabledProp]
+        disabled: item.disabled
       }
     })
   })
@@ -376,7 +375,6 @@ function createFormItemRadioAndCheckboxRender () {
     const { attrs } = renderOpts
     const labelProp = optionProps.label || 'label'
     const valueProp = optionProps.value || 'value'
-    const disabledProp = optionProps.disabled || 'disabled'
     const itemValue = XEUtils.get(data, property)
     return [
       h(`${name}Group`, {
@@ -388,7 +386,7 @@ function createFormItemRadioAndCheckboxRender () {
         return h(name, {
           props: {
             label: option[valueProp],
-            disabled: option[disabledProp]
+            disabled: option.disabled
           }
         }, option[labelProp])
       }))
