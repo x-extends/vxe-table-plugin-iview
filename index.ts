@@ -764,6 +764,7 @@ export const VXETablePluginIView = {
     renderer.mixin(renderMap)
     interceptor.add('event.clearFilter', handleClearEvent)
     interceptor.add('event.clearActived', handleClearEvent)
+    interceptor.add('event.clearAreas', handleClearEvent)
   }
 }
 
