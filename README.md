@@ -1,6 +1,6 @@
 # vxe-table-plugin-iview
 
-[![gitee star](https://gitee.com/xuliangzhan_admin/vxe-table-plugin-iview/badge/star.svg?theme=dark)](https://gitee.com/xuliangzhan_admin/vxe-table-plugin-iview/stargazers)
+[![gitee star](https://gitee.com/x-extends/vxe-table-plugin-iview/badge/star.svg?theme=dark)](https://gitee.com/x-extends/vxe-table-plugin-iview/stargazers)
 [![npm version](https://img.shields.io/npm/v/vxe-table-plugin-iview.svg?style=flat-square)](https://www.npmjs.com/package/vxe-table-plugin-iview)
 [![npm downloads](https://img.shields.io/npm/dm/vxe-table-plugin-iview.svg?style=flat-square)](http://npm-stat.com/charts.html?package=vxe-table-plugin-iview)
 [![npm license](https://img.shields.io/github/license/mashape/apistatus.svg)](LICENSE)
@@ -10,11 +10,12 @@
 ## Installing
 
 ```shell
-npm install xe-utils vxe-table vxe-table-plugin-iview iview
+npm install xe-utils vxe-table vxe-table-plugin-iview view-design
 ```
 
 ```javascript
 // ...
+import VXETable from 'vxe-table'
 import VXETablePluginIView from 'vxe-table-plugin-iview'
 import 'vxe-table-plugin-iview/dist/style.css'
 // ...
@@ -83,8 +84,6 @@ VXETable.use(VXETablePluginIView)
   height="600"
   :data="tableData"
   :edit-config="{trigger: 'click', mode: 'cell'}">
-  <vxe-table-column type="selection" width="60"></vxe-table-column>
-  <vxe-table-column type="index" width="60"></vxe-table-column>
   <vxe-table-column field="name" title="Input" min-width="140" :edit-render="{name: 'Input'}"></vxe-table-column>
   <vxe-table-column field="age" title="InputNumber" width="140" :edit-render="{name: 'InputNumber', props: {max: 35, min: 18}}"></vxe-table-column>
   <vxe-table-column field="sex" title="Select" width="140" :edit-render="{name: 'Select', options: sexList}"></vxe-table-column>
@@ -101,37 +100,17 @@ export default {
   data () {
     return {
       tableData: [
-        {
-          id: 100,
-          name: 'test',
-          age: 26,
-          sex: '1',
-          region: ['shenzhen'],
-          date: null,
-          date2: null,
-          rate: 2,
-          flag: true
-        }
+        { id: 100, name: 'test0', age: 28, sex: '1', region: ['shenzhen'], date: null, date1: null, date2: null, rate: 2, flag: true },
+        { id: 101, name: 'test1', age: 32, sex: '0', region: ['guangzhou'], date: null, date1: null, date2: null, rate: 2, flag: true },
+        { id: 102, name: 'test2', age: 36, sex: '1', region: ['shenzhen'], date: null, date1: null, date2: null, rate: 2, flag: true }
       ],
       sexList: [
-        {
-          'label': '男',
-          'value': '1'
-        },
-        {
-          'label': '女',
-          'value': '0'
-        }
+        { label: '男', value: '1' },
+        { label: '女', value: '0' }
       ],
       regionList: [
-        {
-          'label': '深圳',
-          'value': 'shenzhen'
-        },
-        {
-          'label': '广州',
-          'value': 'guangzhou'
-        }
+        { label: '深圳', value: 'shenzhen' },
+        { label: '广州', value: 'guangzhou' }
       ]
     }
   }
@@ -145,7 +124,6 @@ export default {
   border
   height="600"
   :data="tableData">
-  <vxe-table-column type="index" width="60"></vxe-table-column>
   <vxe-table-column field="name" title="Name"></vxe-table-column>
   <vxe-table-column field="age" title="Age"></vxe-table-column>
   <vxe-table-column field="date" title="Date" :filters="[{data: []}]" :filter-render="{name: 'Input'}"></vxe-table-column>
@@ -157,12 +135,9 @@ export default {
   data () {
     return {
       tableData: [
-        {
-          id: 100,
-          name: 'test',
-          age: 26,
-          date: null
-        }
+        { id: 100, name: 'test0', age: 28, date: null },
+        { id: 101, name: 'test1', age: 32, date: null },
+        { id: 102, name: 'test2', age: 36, date: null }
       ]
     }
   }
