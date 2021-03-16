@@ -1,6 +1,6 @@
 # vxe-table-plugin-iview
 
-[![gitee star](https://gitee.com/xuliangzhan_admin/vxe-table-plugin-iview/badge/star.svg?theme=dark)](https://gitee.com/xuliangzhan_admin/vxe-table-plugin-iview/stargazers)
+[![gitee star](https://gitee.com/x-extends/vxe-table-plugin-iview/badge/star.svg?theme=dark)](https://gitee.com/x-extends/vxe-table-plugin-iview/stargazers)
 [![npm version](https://img.shields.io/npm/v/vxe-table-plugin-iview.svg?style=flat-square)](https://www.npmjs.com/package/vxe-table-plugin-iview)
 [![npm downloads](https://img.shields.io/npm/dm/vxe-table-plugin-iview.svg?style=flat-square)](http://npm-stat.com/charts.html?package=vxe-table-plugin-iview)
 [![npm license](https://img.shields.io/github/license/mashape/apistatus.svg)](LICENSE)
@@ -14,11 +14,11 @@ npm install xe-utils vxe-table vxe-table-plugin-iview iview
 ```
 
 ```javascript
-// ... 省略无关代码
+// ...
 import VXETable from 'vxe-table'
 import VXETablePluginIView from 'vxe-table-plugin-iview'
 import 'vxe-table-plugin-iview/dist/style.css'
-// ... 省略无关代码
+// ...
 
 VXETable.use(VXETablePluginIView)
 ```
