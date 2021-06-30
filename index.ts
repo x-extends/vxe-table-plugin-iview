@@ -18,7 +18,7 @@ import {
   FormItemRenderParams,
   FormItemRenderOptions,
   ColumnExportCellRenderParams
-} from 'vxe-table/lib/vxe-table'
+} from 'vxe-table'
 
 function isEmptyValue (cellValue: any) {
   return cellValue === null || cellValue === undefined || cellValue === ''
@@ -68,11 +68,13 @@ function getCellLabelVNs (h: CreateElement, renderOpts: ColumnEditRenderOptions,
   return [
     h('span', {
       class: 'vxe-cell--label'
-    }, placeholder && isEmptyValue(cellLabel) ? [
-      h('span', {
-        class: 'vxe-cell--placeholder'
-      }, formatText(placeholder))
-    ] : formatText(cellLabel))
+    }, placeholder && isEmptyValue(cellLabel)
+      ? [
+          h('span', {
+            class: 'vxe-cell--placeholder'
+          }, formatText(placeholder))
+        ]
+      : formatText(cellLabel))
   ]
 }
 
@@ -187,27 +189,29 @@ function getSelectCellValue (renderOpts: ColumnCellRenderOptions, params: Column
     }
   }
   if (!isEmptyValue(cellValue)) {
-    return XEUtils.map(props.multiple ? cellValue : [cellValue], optionGroups ? (value) => {
-      let selectItem
-      for (let index = 0; index < optionGroups.length; index++) {
-        selectItem = XEUtils.find(optionGroups[index][groupOptions], (item) => item[valueProp] === value)
-        if (selectItem) {
-          break
+    return XEUtils.map(props.multiple ? cellValue : [cellValue], optionGroups
+      ? (value) => {
+          let selectItem
+          for (let index = 0; index < optionGroups.length; index++) {
+            selectItem = XEUtils.find(optionGroups[index][groupOptions], (item) => item[valueProp] === value)
+            if (selectItem) {
+              break
+            }
+          }
+          const cellLabel: any = selectItem ? selectItem[labelProp] : value
+          if (cellData && options && options.length) {
+            cellData[colid] = { value: cellValue, label: cellLabel }
+          }
+          return cellLabel
         }
-      }
-      const cellLabel: any = selectItem ? selectItem[labelProp] : value
-      if (cellData && options && options.length) {
-        cellData[colid] = { value: cellValue, label: cellLabel }
-      }
-      return cellLabel
-    } : (value) => {
-      const selectItem = XEUtils.find(options, (item) => item[valueProp] === value)
-      const cellLabel: any = selectItem ? selectItem[labelProp] : value
-      if (cellData && options && options.length) {
-        cellData[colid] = { value: cellValue, label: cellLabel }
-      }
-      return cellLabel
-    }).join(', ')
+      : (value) => {
+          const selectItem = XEUtils.find(options, (item) => item[valueProp] === value)
+          const cellLabel: any = selectItem ? selectItem[labelProp] : value
+          if (cellData && options && options.length) {
+            cellData[colid] = { value: cellValue, label: cellLabel }
+          }
+          return cellLabel
+        }).join(', ')
   }
   return ''
 }
@@ -525,26 +529,26 @@ export const VXETablePluginIView = {
               class: 'vxe-table--filter-iview-wrapper'
             }, optionGroups
               ? column.filters.map((option, oIndex) => {
-                const optionValue = option.data
-                const props = getCellEditFilterProps(renderOpts, params, optionValue)
-                return h('Select', {
-                  key: oIndex,
-                  attrs,
-                  props,
-                  on: getFilterOns(renderOpts, params, option, () => {
+                  const optionValue = option.data
+                  const props = getCellEditFilterProps(renderOpts, params, optionValue)
+                  return h('Select', {
+                    key: oIndex,
+                    attrs,
+                    props,
+                    on: getFilterOns(renderOpts, params, option, () => {
                     // 处理 change 事件相关逻辑
-                    handleConfirmFilter(params, props.multiple ? (option.data && option.data.length > 0) : !XEUtils.eqNull(option.data), option)
-                  }),
-                  nativeOn
-                }, XEUtils.map(optionGroups, (group, gIndex) => {
-                  return h('OptionGroup', {
-                    key: gIndex,
-                    props: {
-                      label: group[groupLabel]
-                    }
-                  }, renderOptions(h, group[groupOptions], optionProps))
-                }))
-              })
+                      handleConfirmFilter(params, props.multiple ? (option.data && option.data.length > 0) : !XEUtils.eqNull(option.data), option)
+                    }),
+                    nativeOn
+                  }, XEUtils.map(optionGroups, (group, gIndex) => {
+                    return h('OptionGroup', {
+                      key: gIndex,
+                      props: {
+                        label: group[groupLabel]
+                      }
+                    }, renderOptions(h, group[groupOptions], optionProps))
+                  }))
+                })
               : column.filters.map((option, oIndex) => {
                 const optionValue = option.data
                 const props = getCellEditFilterProps(renderOpts, params, optionValue)
