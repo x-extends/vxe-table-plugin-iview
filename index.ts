@@ -444,6 +444,12 @@ function handleClearEvent (params: InterceptorParams, e: any) {
   }
 }
 
+declare module 'vxe-table' {
+  interface RendererMapOptions {
+    defaultFilterMethod?(params: ColumnFilterMethodParams): boolean;
+  }
+}
+
 /**
  * 基于 vxe-table 表格的适配插件，用于兼容 iview 组件库
  */
@@ -455,7 +461,7 @@ export const VXETablePluginIView = {
         renderDefault: createEditRender(),
         renderEdit: createEditRender(),
         renderFilter: createFilterRender(),
-        filterMethod: defaultFilterMethod,
+        defaultFilterMethod: defaultFilterMethod,
         renderItem: createFormItemRender(),
         renderItemContent: createFormItemRender()
       },
@@ -464,7 +470,7 @@ export const VXETablePluginIView = {
         renderDefault: createEditRender(),
         renderEdit: createEditRender(),
         renderFilter: createFilterRender(),
-        filterMethod: defaultFilterMethod,
+        defaultFilterMethod: defaultFilterMethod,
         renderItem: createFormItemRender(),
         renderItemContent: createFormItemRender()
       },
@@ -473,7 +479,7 @@ export const VXETablePluginIView = {
         renderDefault: createEditRender(),
         renderEdit: createEditRender(),
         renderFilter: createFilterRender(),
-        filterMethod: defaultFilterMethod,
+        defaultFilterMethod: defaultFilterMethod,
         renderItem: createFormItemRender(),
         renderItemContent: createFormItemRender()
       },
@@ -566,7 +572,7 @@ export const VXETablePluginIView = {
             )
           ]
         },
-        filterMethod (params) {
+        defaultFilterMethod (params) {
           const { option, row, column } = params
           const { data } = option
           const { property, filterRender: renderOpts } = column
@@ -693,7 +699,7 @@ export const VXETablePluginIView = {
             }))
           ]
         },
-        filterMethod (params) {
+        defaultFilterMethod (params) {
           const { option, row, column } = params
           const { data } = option
           const { filterRender: renderOpts } = column
@@ -725,7 +731,7 @@ export const VXETablePluginIView = {
         renderDefault: createEditRender(),
         renderEdit: createEditRender(),
         renderFilter: createFilterRender(),
-        filterMethod: defaultFilterMethod,
+        defaultFilterMethod: defaultFilterMethod,
         renderItem: createFormItemRender(),
         renderItemContent: createFormItemRender()
       },
@@ -754,7 +760,7 @@ export const VXETablePluginIView = {
             }))
           ]
         },
-        filterMethod: defaultFilterMethod,
+        defaultFilterMethod: defaultFilterMethod,
         renderItem: createFormItemRender(),
         renderItemContent: createFormItemRender()
       },
