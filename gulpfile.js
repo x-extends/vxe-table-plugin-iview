@@ -48,14 +48,13 @@ gulp.task('build_commonjs', function () {
 gulp.task('build_umd', function () {
   return gulp.src(['index.ts'])
     .pipe(ts(tsconfig.compilerOptions))
-    .pipe(replace(`from 'xe-utils/ctor';`, `from 'xe-utils';`))
-    .pipe(replace(`from 'vxe-table/lib/vxe-table';`, `from 'vxe-table';`))
     .pipe(babel({
       moduleId: pack.name,
       presets: ['@babel/env'],
       plugins: [['@babel/transform-modules-umd', {
         globals: {
           [pack.name]: exportModuleName,
+          'vue': 'Vue',
           'vxe-table': 'VXETable',
           'xe-utils': 'XEUtils'
         },

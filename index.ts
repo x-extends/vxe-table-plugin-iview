@@ -19,7 +19,7 @@ import {
   FormItemRenderParams,
   FormItemRenderOptions,
   ColumnExportCellRenderParams
-} from 'vxe-table/lib/vxe-table'
+} from 'vxe-table'
 /* eslint-enable no-unused-vars */
 
 function isEmptyValue (cellValue: any) {
@@ -768,7 +768,7 @@ export const VXETablePluginIView = {
   }
 }
 
-if (typeof window !== 'undefined' && window.VXETable) {
+if (typeof window !== 'undefined' && window.VXETable && window.VXETable.use) {
   window.VXETable.use(VXETablePluginIView)
 }
 
