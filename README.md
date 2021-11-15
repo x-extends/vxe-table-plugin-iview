@@ -10,7 +10,7 @@
 ## Installing
 
 ```shell
-npm install xe-utils vxe-table vxe-table-plugin-iview view-design
+npm install xe-utils vxe-table@3 vxe-table-plugin-iview@1 view-design
 ```
 
 ```javascript
