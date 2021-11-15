@@ -84,14 +84,21 @@ VXETable.use(VXETablePluginIView)
   height="600"
   :data="tableData"
   :edit-config="{trigger: 'click', mode: 'cell'}">
-  <vxe-column field="name" title="Input" min-width="140" :edit-render="{name: 'Input'}"></vxe-column>
-  <vxe-column field="age" title="InputNumber" width="140" :edit-render="{name: 'InputNumber', props: {max: 35, min: 18}}"></vxe-column>
-  <vxe-column field="sex" title="Select" width="140" :edit-render="{name: 'Select', options: sexList}"></vxe-column>
-  <vxe-column field="region" title="Cascader" width="200" :edit-render="{name: 'Cascader', props: {data: regionList}}"> </vxe-column>
-  <vxe-column field="date" title="DatePicker" width="200" :edit-render="{name: 'DatePicker', props: {type: 'date', format: 'yyyy/MM/dd'}}"></vxe-column>
-  <vxe-column field="date2" title="TimePicker" width="200" :edit-render="{name: 'TimePicker', props: {type: 'time'}}"></vxe-column>
-  <vxe-column field="rate" title="Rate" width="200" :edit-render="{name: 'Rate', type: 'visible'}"></vxe-column>
-  <vxe-column field="flag" title="iSwitch" width="100" :edit-render="{name: 'iSwitch', type: 'visible'}"></vxe-column>
+  <vxe-column field="name" title="Name" :edit-render="{}">
+    <template #edit="{ row }">
+      <i-input v-model="row.name"></i-input>
+    </template>
+  </vxe-column>
+  <vxe-column field="age" title="Age" :edit-render="{}">
+    <template #edit="{ row }">
+      <i-input-number v-model="row.age"></i-input-number>
+    </template>
+  </vxe-column>
+  <vxe-column field="date" title="Date" width="200" :edit-render="{}">
+    <template #edit="{ row }">
+      <i-date-picker v-model="row.date" type="date"></i-date-picker>
+    </template>
+  </vxe-column>
 </vxe-table>
 ```
 
@@ -100,17 +107,9 @@ export default {
   data () {
     return {
       tableData: [
-        { id: 100, name: 'test0', age: 28, sex: '1', region: ['shenzhen'], date: null, date1: null, date2: null, rate: 2, flag: true },
-        { id: 101, name: 'test1', age: 32, sex: '0', region: ['guangzhou'], date: null, date1: null, date2: null, rate: 2, flag: true },
-        { id: 102, name: 'test2', age: 36, sex: '1', region: ['shenzhen'], date: null, date1: null, date2: null, rate: 2, flag: true }
-      ],
-      sexList: [
-        { label: '男', value: '1' },
-        { label: '女', value: '0' }
-      ],
-      regionList: [
-        { label: '深圳', value: 'shenzhen' },
-        { label: '广州', value: 'guangzhou' }
+        { id: 100, name: 'test0', age: 28, sex: '1', date: null },
+        { id: 101, name: 'test1', age: 32, sex: '0', date: null },
+        { id: 102, name: 'test2', age: 36, sex: '1', date: null }
       ]
     }
   }
@@ -121,12 +120,15 @@ export default {
 
 ```html
 <vxe-table
-  border
   height="600"
   :data="tableData">
   <vxe-column field="name" title="Name"></vxe-column>
   <vxe-column field="age" title="Age"></vxe-column>
-  <vxe-column field="date" title="Date" :filters="[{data: []}]" :filter-render="{name: 'Input'}"></vxe-column>
+  <vxe-column field="date" title="Date" :filters="[{data: []}]" :filter-render="{}">
+    <template #filter="{ $panel, column }">
+      <i-input type="type" v-for="(option, index) in column.filters" :key="index" v-model="option.data" @input="$panel.changeOption($event, !!option.data, option)"></i-input>
+    </template>
+  </vxe-column>
 </vxe-table>
 ```
 
