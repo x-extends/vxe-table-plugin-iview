@@ -7,6 +7,10 @@
 
 基于 [vxe-table](https://www.npmjs.com/package/vxe-table) 表格的适配插件，用于兼容 [iview](https://www.npmjs.com/package/iview)、[view-design](https://www.npmjs.com/package/view-design) 组件库
 
+## Compatibility
+
+对应 vxe-table v3 版本  
+
 ## Installing
 
 ```shell
