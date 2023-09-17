@@ -1,7 +1,7 @@
 import { CreateElement } from 'vue'
 import XEUtils from 'xe-utils'
 import {
-  VXETable,
+  VXETableCore,
   RenderParams,
   OptionProps,
   InterceptorParams,
@@ -454,7 +454,7 @@ declare module 'vxe-table' {
  * 基于 vxe-table 表格的适配插件，用于兼容 iview 组件库
  */
 export const VXETablePluginIView = {
-  install (vxetable: typeof VXETable) {
+  install (vxetable: VXETableCore) {
     // 检查版本
     if (!/^(2|3)\./.test(vxetable.version)) {
       console.error('[vxe-table-plugin-iview] Version vxe-table 3.x is required')
