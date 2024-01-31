@@ -451,13 +451,13 @@ declare module 'vxe-table' {
 }
 
 /**
- * 基于 vxe-table 表格的适配插件，用于兼容 iview 组件库
+ * 基于 vxe-table 的表格适配插件，用于兼容 iview、view-design 组件库
  */
 export const VXETablePluginIView = {
   install (vxetable: VXETableCore) {
     // 检查版本
-    if (!/^(2|3)\./.test(vxetable.version)) {
-      console.error('[vxe-table-plugin-iview] Version vxe-table 3.x is required')
+    if (!/^(3)\./.test(vxetable.version)) {
+      console.error('[vxe-table-plugin-iview 3.x] Version vxe-table 3.x is required')
     }
 
     vxetable.renderer.mixin({
