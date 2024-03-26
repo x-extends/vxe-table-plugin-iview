@@ -1,0 +1,10 @@
+import { VXETableCore } from 'vxe-table'
+
+/**
+ * 基于 vxe-table 的表格适配插件，用于兼容 view-ui-plus 组件库
+ */
+export declare const VXETablePluginIView: {
+  install (vxetable: VXETableCore): void
+}
+
+export default VXETablePluginIView
